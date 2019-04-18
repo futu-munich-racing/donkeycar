@@ -22,14 +22,13 @@ from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.actuator import PCA9685, PWMSteering, PWMThrottle
 from donkeycar.parts.datastore import TubGroup, TubWriter
 from donkeycar.parts.web_controller import LocalWebController
+from donkeycar.parts.joystick import LogitechJoystickController
 from donkeycar.parts.clock import Timestamp
 from donkeycar.parts.datastore import TubGroup, TubWriter
 from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.transform import Lambda
 
-
-def drive(cfg, model_path=None, use_chaos=False):
-
+def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     """
     Construct a working robotic vehicle from many parts.
     Each part runs as a job in the Vehicle loop, calling either
@@ -48,7 +47,16 @@ def drive(cfg, model_path=None, use_chaos=False):
     cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
     V.add(cam, outputs=['cam/image_array'], threaded=True)
 
-    ctr = LocalWebController(use_chaos=use_chaos)
+    if use_joystick or cfg.USE_JOYSTICK_AS_DEFAULT:
+        ctr = LogitechJoystickController(throttle_scale=cfg.JOYSTICK_MAX_THROTTLE,
+                                         steering_scale=cfg.JOYSTICK_STEERING_SCALE,
+                                         auto_record_on_throttle=cfg.AUTO_RECORD_ON_THROTTLE)
+
+    else:
+        # This web controller will create a web server that is capable
+        # of managing steering, throttle, and modes, and more.
+        ctr = LocalWebController(use_chaos=use_chaos)
+
     V.add(ctr,
           inputs=['cam/image_array'],
           outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
@@ -99,7 +107,7 @@ def drive(cfg, model_path=None, use_chaos=False):
     steering_controller = PCA9685(cfg.STEERING_CHANNEL)
     steering = PWMSteering(controller=steering_controller,
                            left_pulse=cfg.STEERING_LEFT_PWM,
-                           right_pulse=cfg.STEERING_RIGHT_PWM) 
+                           right_pulse=cfg.STEERING_RIGHT_PWM)
 
     throttle_controller = PCA9685(cfg.THROTTLE_CHANNEL)
     throttle = PWMThrottle(controller=throttle_controller,
@@ -169,7 +177,7 @@ if __name__ == '__main__':
     cfg = dk.load_config()
 
     if args['drive']:
-        drive(cfg, model_path=args['--model'], use_chaos=args['--chaos'])
+        drive(cfg, model_path=args['--model'], use_joystick=args['--js'], use_chaos=args['--chaos'])
 
     elif args['train']:
         tub = args['--tub']
@@ -177,8 +185,3 @@ if __name__ == '__main__':
         base_model_path = args['--base_model']
         cache = not args['--no_cache']
         train(cfg, tub, new_model_path, base_model_path)
-
-
-
-
-
