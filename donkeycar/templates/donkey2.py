@@ -14,7 +14,8 @@ Options:
 import os
 
 from docopt import docopt
-import donkeycar as dk
+from donkeycar import load_config
+from donkeycar.vehicle import Vehicle
 
 from donkeycar.parts.camera import PiCamera
 from donkeycar.parts.transform import Lambda
@@ -39,13 +40,38 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     to parts requesting the same named input.
     """
 
-    V = dk.vehicle.Vehicle()
+    V = Vehicle()
 
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
 
-    cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
+    cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION, enable_undistort=False) #cfg.ENABLE_UNDISTORT)
     V.add(cam, outputs=['cam/image_array'], threaded=True)
+
+    # See if we should even run the pilot module.
+    # This is only needed because the part run_condition only accepts boolean
+    def pilot_condition(mode):
+        if mode == 'user':
+            return False
+        else:
+            return True
+
+    pilot_condition_part = Lambda(pilot_condition)
+    V.add(pilot_condition_part,
+          inputs=['user/mode'],
+          outputs=['run_pilot'])
+    # Run the pilot if the mode is not user.
+    kl = KerasLinear()
+    if model_path:
+        print('Loading_model...', end='')
+        kl.load(model_path)
+        print('loaded.')
+    V.add(kl,
+          inputs=['cam/image_array'],
+          outputs=['pilot/angle', 'pilot/throttle'],
+          run_condition='run_pilot')
+
+
 
     if use_joystick or cfg.USE_JOYSTICK_AS_DEFAULT:
         ctr = LogitechJoystickController(throttle_scale=cfg.JOYSTICK_MAX_THROTTLE,
@@ -62,30 +88,7 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
           outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
           threaded=True)
 
-    # See if we should even run the pilot module.
-    # This is only needed because the part run_condition only accepts boolean
-    def pilot_condition(mode):
-        if mode == 'user':
-            return False
-        else:
-            return True
-
-    pilot_condition_part = Lambda(pilot_condition)
-    V.add(pilot_condition_part,
-          inputs=['user/mode'],
-          outputs=['run_pilot'])
-
-    # Run the pilot if the mode is not user.
-    kl = KerasLinear()
-    if model_path:
-        kl.load(model_path)
-
-    V.add(kl,
-          inputs=['cam/image_array'],
-          outputs=['pilot/angle', 'pilot/throttle'],
-          run_condition='run_pilot')
-
-    # Choose what inputs should change the car.
+     # Choose what inputs should change the car.
     def drive_mode(mode,
                    user_angle, user_throttle,
                    pilot_angle, pilot_throttle):
@@ -103,7 +106,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
           inputs=['user/mode', 'user/angle', 'user/throttle',
                   'pilot/angle', 'pilot/throttle'],
           outputs=['angle', 'throttle'])
-
     steering_controller = PCA9685(cfg.STEERING_CHANNEL)
     steering = PWMSteering(controller=steering_controller,
                            left_pulse=cfg.STEERING_LEFT_PWM,
@@ -117,7 +119,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     V.add(steering, inputs=['angle'])
     V.add(throttle, inputs=['throttle'])
-
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle', 'user/throttle', 'user/mode', 'timestamp']
     types = ['image_array', 'float', 'float',  'str', 'str']
@@ -174,7 +175,7 @@ def train(cfg, tub_names, new_model_path, base_model_path=None):
 
 if __name__ == '__main__':
     args = docopt(__doc__)
-    cfg = dk.load_config()
+    cfg = load_config()
 
     if args['drive']:
         drive(cfg, model_path=args['--model'], use_joystick=args['--js'], use_chaos=args['--chaos'])

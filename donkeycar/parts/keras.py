@@ -12,10 +12,16 @@ from tensorflow.python.keras.layers import Convolution2D
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense
 from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
 
+from donkeycar import load_config
+
+from keras import backend as K
+
+cfg = load_config()
 
 class KerasPilot:
 
     def load(self, model_path):
+        K.clear_session()
         self.model = load_model(model_path)
 
     def shutdown(self):
@@ -73,13 +79,13 @@ class KerasLinear(KerasPilot):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
         outputs = self.model.predict(img_arr)
         # print(len(outputs), outputs)
-        steering = outputs[0]
-        throttle = outputs[1]
-        return steering[0][0], throttle[0][0]
+        steering = outputs #[0]
+#        throttle = outputs[1]
+        return steering[0][0], 0 #throttle[0][0]
 
 
 def default_linear():
-    img_in = Input(shape=(120, 160, 3), name='img_in')
+    img_in = Input(shape=(*cfg.CAMERA_RESOLUTION, 3), name='img_in')
     x = img_in
 
     # Convolution2D class name is an alias for Conv2D

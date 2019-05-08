@@ -7,7 +7,6 @@ __version__ = pkg_resources.require("donkeycar")[0].version
 print('using donkey version: {} ...'.format(__version__))
 
 
-
 current_module = sys.modules[__name__]
 
 

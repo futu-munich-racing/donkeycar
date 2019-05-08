@@ -89,7 +89,7 @@ class Vehicle:
 
             # wait until the parts warm up.
             logger.info('Starting vehicle...')
-            time.sleep(1)
+            time.sleep(0.1)
 
             loop_count = 0
             while self.on:
