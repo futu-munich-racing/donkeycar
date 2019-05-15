@@ -67,10 +67,10 @@ class CalibratedPiCamera(PiCamera):
         super.__init__(self, resolution=resolution, framerate=framerate)
 
         # Camera calibration parameters
-        #self.K = np.load(os.path.dirname(os.path.abspath(__file__))+'/K.npy')
-        #self.D = np.load(os.path.dirname(os.path.abspath(__file__))+'/D.npy')
-        self.K = np.array([[479.8318979408517, 0.0, 954.2149111061347], [0.0, 479.85715507348357, 539.5262623708809], [0.0, 0.0, 1.0]])
-        self.D = np.array([[0.01742013226378499], [-0.07783488206037675], [0.10561876029481891], [-0.05533474379824904]])
+        self.K = np.load(os.path.dirname(os.path.abspath(__file__))+'/K.npy')
+        self.D = np.load(os.path.dirname(os.path.abspath(__file__))+'/D.npy')
+        #self.K = np.array([[479.8318979408517, 0.0, 954.2149111061347], [0.0, 479.85715507348357, 539.5262623708809], [0.0, 0.0, 1.0]])
+        #self.D = np.array([[0.01742013226378499], [-0.07783488206037675], [0.10561876029481891], [-0.05533474379824904]])
         self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.K, self.D, np.eye(3), self.K, resolution, cv2.CV_16SC2)
     
     def undistort(self, img):
