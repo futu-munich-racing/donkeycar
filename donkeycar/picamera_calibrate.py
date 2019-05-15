@@ -24,7 +24,7 @@ def main():
     # Parse input arguments e.g. folder containing the images
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--imagedir')
-    parser.add_argument('-d', '--debug', default='false')
+    parser.add_argument('-d', '--debug', default=None)
     args = parser.parse_args()
     
 
@@ -75,10 +75,14 @@ def main():
     np.save('K', K)
     np.save('D', D)
 
-    if args.debug == 'true':
+    if args.debug is not None:
+        img = cv2.imread(args.debug)
         img_u = undistort(img, K, D)    
         cv2.imshow('undistorted image', img_u)
-        cv2.waitKey(0)
+        key = ''
+        print("Press ESC to exit.")
+        while key != 27:
+            key = cv2.waitKey(100)
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
