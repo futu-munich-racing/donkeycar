@@ -45,7 +45,11 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
 
-    cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION, enable_undistort=False) #cfg.ENABLE_UNDISTORT)
+    if cfg.ENABLE_UNDISTORT:
+        cam = CalibratedPiCamera(res)
+    else:
+        cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
+    
     V.add(cam, outputs=['cam/image_array'], threaded=True)
 
     # See if we should even run the pilot module.
