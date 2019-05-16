@@ -5,6 +5,7 @@ class SteeringControl:
         self._protocol = protocol
 
     def run(self, steering):
+        print(steering)
         self._protocol.setSteering(steering)
 
 class ThrottleControl:
@@ -12,6 +13,7 @@ class ThrottleControl:
         self._protocol = protocol
 
     def run(self, throttle):
+        print(throttle)
         self._protocol.setThrottle(throttle)
 
 class IMUSensor:
