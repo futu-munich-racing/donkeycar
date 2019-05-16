@@ -88,11 +88,13 @@ class Protocol:
         self._loop.run_forever()
 
     def setSteering(self, steering):
+        print(steering)
         if isinstance(steering, int):
             self._steering = steering
         self._sendControlPacket(self._steering, self._throttle)
 
     def setThrottle(self, throttle):
+        print(throttle)
         if isinstance(throttle, int):
             self._throttle = throttle
         self._sendControlPacket(self._steering, self._throttle)
