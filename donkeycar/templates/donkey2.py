@@ -49,8 +49,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(usbPeripheral, threaded=True)
     V.add(usbPeripheral.getIMUPart(), outputs=['imu'])
     V.add(usbPeripheral.getDistancePart(), outputs=['distance'])
-    V.add(usbPeripheral.getSteeringPart(), inputs=['angle'])
-    V.add(usbPeripheral.getThrottlePart(), inputs=['throttle'])
 
     cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
     V.add(cam, outputs=['cam/image_array'], threaded=True)
@@ -125,6 +123,10 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     # V.add(steering, inputs=['angle'])
     # V.add(throttle, inputs=['throttle'])
+
+    # Use the new parts for control
+    V.add(usbPeripheral.getSteeringPart(), inputs=['angle'])
+    V.add(usbPeripheral.getThrottlePart(), inputs=['throttle'])
 
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle', 'user/throttle', 'user/mode', 'timestamp']
