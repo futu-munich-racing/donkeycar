@@ -52,7 +52,7 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(usbPeripheral.getIMUPart(), outputs=['imu/accel_x', 'imu/accel_y', 'imu/accel_z',
                                                'imu/gyro_x', 'imu/gyro_y', 'imu/gyro_z', 'imu/magneto_x', 'imu/magneto_y', 'imu/magneto_z'])
     V.add(usbPeripheral.getDistancePart(), outputs=[
-          'distance_left', 'distance_right', 'distance_center'])
+          'distance/left', 'distance/right', 'distance/center'])
 
     cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
     V.add(cam, outputs=['cam/image_array'], threaded=True)
