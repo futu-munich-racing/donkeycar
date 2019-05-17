@@ -91,17 +91,17 @@ class Protocol:
         print(steering)
         if isinstance(steering, int):
             self._steering = steering
-        self._sendControlPacket(self._steering, self._throttle)
+        self._sendControlPacket()
 
     def setThrottle(self, throttle):
         print(throttle)
         if isinstance(throttle, int):
             self._throttle = throttle
-        self._sendControlPacket(self._steering, self._throttle)
+        self._sendControlPacket()
 
-    def _sendControlPacket(self, steering, throttle):
-        print('Steering: {0}, Speed: {1}'.format(steering, throttle))
-        payload = bytearray(struct.pack('<HH', steering, throttle))
+    def _sendControlPacket(self):
+        print('Steering: {0}, Speed: {1}'.format(self._steering, self._throttle))
+        payload = bytearray(struct.pack('<HH', self._steering, self._throttle))
         checksum = calcChecksum(payload)
         payload.extend(checksum)
         self._loop.create_task(
