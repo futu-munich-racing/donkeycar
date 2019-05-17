@@ -29,6 +29,7 @@ from donkeycar.parts.datastore import TubGroup, TubWriter
 from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.transform import Lambda
 
+
 def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     """
     Construct a working robotic vehicle from many parts.
@@ -45,10 +46,13 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
 
+    # Add USB peripheral parts
     usbPeripheral = PeripheralPart()
     V.add(usbPeripheral, threaded=True)
-    V.add(usbPeripheral.getIMUPart(), outputs=['imu'])
-    V.add(usbPeripheral.getDistancePart(), outputs=['distance'])
+    V.add(usbPeripheral.getIMUPart(), outputs=['imu/accel_x', 'imu/accel_y', 'imu/accel_z',
+                                               'imu/gyro_x', 'imu/gyro_y', 'imu/gyro_z', 'imu/magneto_x', 'imu/magneto_y', 'imu/magneto_z'])
+    V.add(usbPeripheral.getDistancePart(), outputs=[
+          'distance_left', 'distance_right', 'distance_center'])
 
     cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
     V.add(cam, outputs=['cam/image_array'], threaded=True)
@@ -129,7 +133,8 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(usbPeripheral.getThrottlePart(), inputs=['throttle'])
 
     # add tub to save data
-    inputs = ['cam/image_array', 'user/angle', 'user/throttle', 'user/mode', 'timestamp']
+    inputs = ['cam/image_array', 'user/angle',
+              'user/throttle', 'user/mode', 'timestamp']
     types = ['image_array', 'float', 'float',  'str', 'str']
 
     # multiple tubs
@@ -187,7 +192,8 @@ if __name__ == '__main__':
     cfg = dk.load_config()
 
     if args['drive']:
-        drive(cfg, model_path=args['--model'], use_joystick=args['--js'], use_chaos=args['--chaos'])
+        drive(cfg, model_path=args['--model'],
+              use_joystick=args['--js'], use_chaos=args['--chaos'])
 
     elif args['train']:
         tub = args['--tub']

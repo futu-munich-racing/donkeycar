@@ -1,20 +1,23 @@
 from .protocol import Protocol, SensorPacket
 
+
 class SteeringControl:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
 
-    def run(self, steering):
-        print(steering)
-        self._protocol.setSteering(int(steering))
+    def run(self, **kwargs):
+        print(kwargs)
+        # self._protocol.setSteering(int(steering))
+
 
 class ThrottleControl:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
 
-    def run(self, throttle):
-        print(throttle)
-        self._protocol.setThrottle(int(throttle))
+    def run(self, **kwargs):
+        print(kwargs)
+        # self._protocol.setThrottle(int(throttle))
+
 
 class IMUSensor:
     def __init__(self, protocol: Protocol):
@@ -22,7 +25,8 @@ class IMUSensor:
         self.data = None
 
     def run(self,):
-        return self.data
+        return self.data['accel'][0], self.data['accel'][1], self.data['accel'][2], self.data['gyro'][0], self.data['gyro'][1], self.data['gyro'][2], self.data['magneto'][0], self.data['magneto'][1], self.data['magneto'][2]
+
 
 class DistanceSensor:
     def __init__(self, protocol: Protocol):
@@ -30,7 +34,8 @@ class DistanceSensor:
         self.data = None
 
     def run(self,):
-        return self.data
+        return self.data['left'], self.data['right'], self.data['center']
+
 
 class PeripheralPart:
     def __init__(self):
@@ -52,7 +57,7 @@ class PeripheralPart:
     def getDistancePart(self):
         return self._distance
 
-    def _updateValues(self, packet:SensorPacket):
+    def _updateValues(self, packet: SensorPacket):
         # self._current = packet
         self._imu.data = {
             'accel': packet.acceleration,

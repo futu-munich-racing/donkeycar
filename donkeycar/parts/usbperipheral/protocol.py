@@ -52,14 +52,10 @@ class Serial(asyncio.Protocol):
         self._transport = transport
         self._buffer = bytearray()
 
-    def connection_lost(self, exc):
-        print('Writer closed')
-
     async def send(self, packet):
         self._transport.serial.write(packet)
 
     def data_received(self, data):
-        print('Data received')
         self._buffer += data
         if len(self._buffer) >= 28:
             try:
@@ -88,20 +84,17 @@ class Protocol:
         self._loop.run_forever()
 
     def setSteering(self, steering):
-        print(steering)
-        if isinstance(steering, int):
-            self._steering = steering
+        self._steering = steering
         self._sendControlPacket()
 
     def setThrottle(self, throttle):
-        print(throttle)
-        if isinstance(throttle, int):
-            self._throttle = throttle
+        self._throttle = throttle
         self._sendControlPacket()
 
     def _sendControlPacket(self):
-        print('Steering: {0}, Speed: {1}'.format(self._steering, self._throttle))
-        payload = bytearray(struct.pack('<HH', self._steering, self._throttle))
+        print('Steering: {0}, Speed: {1}'.format(
+            int(self._steering), int(self._throttle)))
+        payload = bytearray(struct.pack('<HH', int(self._steering), int(self._throttle)))
         checksum = calcChecksum(payload)
         payload.extend(checksum)
         self._loop.create_task(
