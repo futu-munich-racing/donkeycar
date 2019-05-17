@@ -5,8 +5,8 @@ class SteeringControl:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
 
-    def run(self, **kwargs):
-        print(kwargs)
+    def run(self, **args):
+        print(args)
         # self._protocol.setSteering(int(steering))
 
 
@@ -14,8 +14,8 @@ class ThrottleControl:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
 
-    def run(self, **kwargs):
-        print(kwargs)
+    def run(self, **args):
+        print(args)
         # self._protocol.setThrottle(int(throttle))
 
 
