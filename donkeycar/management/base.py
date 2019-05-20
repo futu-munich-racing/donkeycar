@@ -149,11 +149,17 @@ class CalibrateCar(BaseCommand):
         return parsed_args
 
     def run(self, args):
-        from donkeycar.parts.actuator import PCA9685
+        # from donkeycar.parts.actuator import PCA9685
+        from threading import Thread
+        from donkeycar.parts.usbperipheral import PeripheralPart
 
-        args = self.parse_args(args)
+        # args = self.parse_args(args)
         channel = int(args.channel)
-        c = PCA9685(channel)
+        # c = PCA9685(channel)
+        peripheral = PeripheralPart()
+        thread = Thread(target=peripheral.update)
+        
+        thread.start()
 
 
         while True:
@@ -161,8 +167,12 @@ class CalibrateCar(BaseCommand):
                 val = input("""Enter a PWM setting to test ('q' for quit) (0-1500): """)
                 if val == 'q' or val == 'Q':
                     break
-                pmw = int(val)
-                c.run(pmw)
+                pwm = int(va
+                
+                if channel == 0:
+                    peripheral.getControlPart().run(pwm, 0)
+                elif channel == 1:
+                    peripheral.getControlPart().run(0, pwm)
             except KeyboardInterrupt:
                 print("\nKeyboardInterrupt received, exit.")
                 break
