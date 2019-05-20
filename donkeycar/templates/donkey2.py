@@ -132,8 +132,7 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     # V.add(throttle, inputs=['throttle'])
 
     # Use the new parts for control
-    V.add(usbPeripheral.getSteeringPart(), inputs=['angle'])
-    V.add(usbPeripheral.getThrottlePart(), inputs=['throttle'])
+    V.add(usbPeripheral.getControlPart(), inputs=['angle', 'throttle'])
 
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle',

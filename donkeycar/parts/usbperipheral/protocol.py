@@ -1,6 +1,3 @@
-# Sources from: https://tinkering.xyz/async-serial/
-# Thanks for the great article!
-
 import asyncio
 import serial_asyncio
 from sliplib import Driver as SLIPDriver
@@ -17,6 +14,9 @@ slipDriver = SLIPDriver()
 
 class SensorPacket:
     def __init__(self, data):
+        if isinstance(data, int):
+            self.valid = False
+            return
         payload = data[0:24]
         checksum = data[24:28]
         calculatedChecksum = calcChecksum(payload)
@@ -77,24 +77,13 @@ class Protocol:
             self._loop, lambda: self._serialProtocol, device, baudrate=baud)
         asyncio.ensure_future(self._serialConnection)
 
-        self._steering = 0
-        self._throttle = 0
-
     def start(self):
         self._loop.run_forever()
 
-    def setSteering(self, steering):
-        self._steering = steering
-        self._sendControlPacket()
-
-    def setThrottle(self, throttle):
-        self._throttle = throttle
-        self._sendControlPacket()
-
-    def _sendControlPacket(self):
+    def sendControlPacket(self, steering, throttle):
         print('Steering: {0}, Speed: {1}'.format(
-            int(self._steering), int(self._throttle)))
-        payload = bytearray(struct.pack('<HH', int(self._steering), int(self._throttle)))
+            steering, throttle))
+        payload = bytearray(struct.pack('<HH', steering, throttle))
         checksum = calcChecksum(payload)
         payload.extend(checksum)
         self._loop.create_task(

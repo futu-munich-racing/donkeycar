@@ -1,22 +1,13 @@
 from .protocol import Protocol, SensorPacket
 
 
-class SteeringControl:
+class ControlPart:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
 
-    def run(self, **args):
-        print(args)
-        # self._protocol.setSteering(int(steering))
-
-
-class ThrottleControl:
-    def __init__(self, protocol: Protocol):
-        self._protocol = protocol
-
-    def run(self, **args):
-        print(args)
-        # self._protocol.setThrottle(int(throttle))
+    def run(self, steering, throttle):
+        print(steering, throttle)
+        self._protocol.sendControlPacket(int(steering),int(throttle))
 
 
 class IMUSensor:
@@ -25,6 +16,7 @@ class IMUSensor:
         self.data = None
 
     def run(self,):
+        print(self.data)
         return self.data['accel'][0], self.data['accel'][1], self.data['accel'][2], self.data['gyro'][0], self.data['gyro'][1], self.data['gyro'][2], self.data['magneto'][0], self.data['magneto'][1], self.data['magneto'][2]
 
 
@@ -34,22 +26,19 @@ class DistanceSensor:
         self.data = None
 
     def run(self,):
+        print(self.data)
         return self.data['left'], self.data['right'], self.data['center']
 
 
 class PeripheralPart:
     def __init__(self):
         self._protocol = Protocol(packetHandler=self._updateValues)
-        self._steering = SteeringControl(self._protocol)
-        self._throttle = ThrottleControl(self._protocol)
+        self._control = ControlPart(self._protocol)
         self._imu = IMUSensor(self._protocol)
         self._distance = DistanceSensor(self._protocol)
 
-    def getSteeringPart(self):
-        return self._steering
-
-    def getThrottlePart(self):
-        return self._throttle
+    def getControlPart(self):
+        return self._control
 
     def getIMUPart(self):
         return self._imu
