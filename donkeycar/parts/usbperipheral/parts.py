@@ -6,10 +6,10 @@ class ControlPart:
         self._protocol = protocol
 
     def run(self, steering, throttle):
-        print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
+        #print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
         steering = int(90 + (steering * 60))
         throttle = int(1500 + (throttle * -500))
-        print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
+        #print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
         self._protocol.sendControlPacket(steering, int(throttle))
 
 
@@ -19,7 +19,7 @@ class IMUSensor:
         self.data = None
 
     def run(self,):
-        print(self.data)
+        # print(self.data)
         return self.data['accel'][0], self.data['accel'][1], self.data['accel'][2], self.data['gyro'][0], self.data['gyro'][1], self.data['gyro'][2], self.data['magneto'][0], self.data['magneto'][1], self.data['magneto'][2]
 
 
@@ -29,7 +29,7 @@ class DistanceSensor:
         self.data = None
 
     def run(self,):
-        print(self.data)
+        # print(self.data)
         return self.data['left'], self.data['right'], self.data['center']
 
 
