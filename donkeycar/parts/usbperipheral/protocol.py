@@ -70,7 +70,7 @@ class Serial(asyncio.Protocol):
 
 
 class Protocol:
-    def __init__(self, device='/dev/ttyACM0', baud=115200, packetHandler=lambda: None):
+    def __init__(self, device='/dev/ttyAMA0', baud=115200, packetHandler=lambda: None):
         self._loop = asyncio.get_event_loop()
         self._serialProtocol = Serial(packetHandler)
         self._serialConnection = serial_asyncio.create_serial_connection(
