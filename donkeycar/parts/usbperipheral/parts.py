@@ -6,8 +6,11 @@ class ControlPart:
         self._protocol = protocol
 
     def run(self, steering, throttle):
-        print(steering, throttle)
-        self._protocol.sendControlPacket(int(steering),int(throttle))
+        print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
+        steering = int(90 + (steering * 60))
+        throttle = int(1500 + (throttle * -500))
+        print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
+        self._protocol.sendControlPacket(steering, int(throttle))
 
 
 class IMUSensor:

@@ -81,8 +81,6 @@ class Protocol:
         self._loop.run_forever()
 
     def sendControlPacket(self, steering, throttle):
-        print('Steering: {0}, Speed: {1}'.format(
-            steering, throttle))
         payload = bytearray(struct.pack('<HH', steering, throttle))
         checksum = calcChecksum(payload)
         payload.extend(checksum)
