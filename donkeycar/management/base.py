@@ -153,7 +153,7 @@ class CalibrateCar(BaseCommand):
         from threading import Thread
         from donkeycar.parts.usbperipheral import PeripheralPart
 
-        # args = self.parse_args(args)
+        args = self.parse_args(args)
         channel = int(args.channel)
         # c = PCA9685(channel)
         peripheral = PeripheralPart()
@@ -388,7 +388,6 @@ def execute_from_command_line():
             'tubhist': ShowHistogram,
             'tubplot': ShowPredictionPlots,
             'tubcheck': TubCheck,
-            'makemovie': MakeMovie,
             'sim': Sim,
                 }
 
