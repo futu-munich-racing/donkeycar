@@ -157,6 +157,9 @@ class CalibrateCar(BaseCommand):
         channel = int(args.channel)
         # c = PCA9685(channel)
         peripheral = PeripheralPart()
+
+        print('Calibrating channel #{0}'.format(channel))
+
         thread = Thread(target=peripheral.update)
         
         thread.start()
@@ -167,8 +170,7 @@ class CalibrateCar(BaseCommand):
                 val = input("""Enter a PWM setting to test ('q' for quit) (0-1500): """)
                 if val == 'q' or val == 'Q':
                     break
-                pwm = int(va
-                
+                pwm = int(val)
                 if channel == 0:
                     peripheral.getControlPart().run(pwm, 0)
                 elif channel == 1:
