@@ -26,13 +26,13 @@ class IMUSensor:
     def updateData(self, data):
         self._data = data
         self._madgwick.update(
-            self._calcUnit(self._data['gyro'], 4.375), self._calcUnit(self._data['accel'], 0.061), self._calcUnit(self._data['magneto'], 6842.0))
+            self._calcUnit(self._data['gyro'], 4.375), self._calcUnit(self._data['accel'], 0.061), self._calcUnit(self._data['magneto'], 1.0/6842.0))
 
     def _calcUnit(self, values, factor):
         return [
-            values[0]/factor,
-            values[1]/factor,
-            values[2]/factor
+            values[0]*factor,
+            values[1]*factor,
+            values[2]*factor
         ]
 
     def run(self,):
