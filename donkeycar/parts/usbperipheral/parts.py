@@ -2,12 +2,12 @@ from .protocol import Protocol, SensorPacket
 from .madgwick.madgwickahrs import MadgwickAHRS
 
 
-def convertUnit(self, values, factor):
-        return [
-            values[0]*factor,
-            values[1]*factor,
-            values[2]*factor
-        ]
+def convertUnit(values, factor):
+    return [
+        values[0]*factor,
+        values[1]*factor,
+        values[2]*factor
+    ]
 
 
 class ControlPart:
@@ -33,7 +33,8 @@ class IMUSensor:
 
     def updateData(self, data):
         self._data = data
-        self._madgwick.update(self._data['gyro'], self._data['accel'], self._data['magneto'])
+        self._madgwick.update(
+            self._data['gyro'], self._data['accel'], self._data['magneto'])
 
     def run(self,):
         # print(self._madgwick.quaternion.to_euler_angles())
