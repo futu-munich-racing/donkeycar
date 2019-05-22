@@ -37,7 +37,7 @@ class IMUSensor:
             self._data['gyro'], self._data['accel'], self._data['magneto'])
 
     def run(self,):
-        # print(self._madgwick.quaternion.to_euler_angles())
+        print(self._madgwick.quaternion.to_euler_angles())
         print(self._data)
         return self._data['accel'][0], self._data['accel'][1], self._data['accel'][2], self._data['gyro'][0], self._data['gyro'][1], self._data['gyro'][2], self._data['magneto'][0], self._data['magneto'][1], self._data['magneto'][2]
 
@@ -72,9 +72,9 @@ class PeripheralPart:
 
     def _updateValues(self, packet: SensorPacket):
         self._imu.updateData({
-            'accel': convertUnit(packet.acceleration, 0.061),
-            'gyro': convertUnit(packet.gyro, 4.375),
-            'magneto': convertUnit(packet.magneto, 1.0/6842.0)
+            'accel': convertUnit(packet.acceleration, 0.061), # convert to mg (g != gramm, it's force)
+            'gyro': convertUnit(packet.gyro, 4.375), #  convert to mdps
+            'magneto': convertUnit(packet.magneto, 1.0/6842.0) # convert to mgauss
         })
         self._distance.updateData(packet.distance)
 
