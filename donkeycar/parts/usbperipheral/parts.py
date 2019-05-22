@@ -2,6 +2,14 @@ from .protocol import Protocol, SensorPacket
 from .madgwick.madgwickahrs import MadgwickAHRS
 
 
+def convertUnit(self, values, factor):
+        return [
+            values[0]*factor,
+            values[1]*factor,
+            values[2]*factor
+        ]
+
+
 class ControlPart:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
@@ -25,18 +33,11 @@ class IMUSensor:
 
     def updateData(self, data):
         self._data = data
-        self._madgwick.update(
-            self._calcUnit(self._data['gyro'], 4.375), self._calcUnit(self._data['accel'], 0.061), self._calcUnit(self._data['magneto'], 1.0/6842.0))
-
-    def _calcUnit(self, values, factor):
-        return [
-            values[0]*factor,
-            values[1]*factor,
-            values[2]*factor
-        ]
+        self._madgwick.update(self._data['gyro'], self._data['accel'], self._data['magneto'])
 
     def run(self,):
         # print(self._madgwick.quaternion.to_euler_angles())
+        print(self._data)
         return self._data['accel'][0], self._data['accel'][1], self._data['accel'][2], self._data['gyro'][0], self._data['gyro'][1], self._data['gyro'][2], self._data['magneto'][0], self._data['magneto'][1], self._data['magneto'][2]
 
 
@@ -70,9 +71,9 @@ class PeripheralPart:
 
     def _updateValues(self, packet: SensorPacket):
         self._imu.updateData({
-            'accel': packet.acceleration,
-            'gyro': packet.gyro,
-            'magneto': packet.magneto
+            'accel': convertUnit(packet.acceleration, 0.061),
+            'gyro': convertUnit(packet.gyro, 4.375),
+            'magneto': convertUnit(packet.magneto, 1.0/6842.0)
         })
         self._distance.updateData(packet.distance)
 
