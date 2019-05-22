@@ -376,7 +376,6 @@ def execute_from_command_line():
             'tubhist': ShowHistogram,
             'tubplot': ShowPredictionPlots,
             'tubcheck': TubCheck,
-            'makemovie': MakeMovie,
             'sim': Sim,
                 }
 
