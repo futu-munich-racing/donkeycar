@@ -27,6 +27,7 @@ class IMUSensor:
 
     def run(self,):
         print(self._madgwick.quaternion)
+        print(self._data)
         return self._data['accel'][0], self._data['accel'][1], self._data['accel'][2], self._data['gyro'][0], self._data['gyro'][1], self._data['gyro'][2], self._data['magneto'][0], self._data['magneto'][1], self._data['magneto'][2]
 
 
