@@ -98,8 +98,6 @@ class Vehicle:
 
                 self.update_parts()
 
-                print('Still here: {0}'.format(loop_count))
-
                 # stop drive loop if loop_count exceeds max_loopcount
                 if max_loop_count and loop_count > max_loop_count:
                     self.on = False
