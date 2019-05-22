@@ -170,7 +170,7 @@ class CalibrateCar(BaseCommand):
                 val = input("""Enter a PWM setting to test ('q' for quit) (0-1500): """)
                 if val == 'q' or val == 'Q':
                     break
-                pwm = int(val)
+                pwm = float(val)
                 if channel == 0:
                     peripheral.getControlPart().run(pwm, 0)
                 elif channel == 1:

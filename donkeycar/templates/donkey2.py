@@ -49,8 +49,8 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     # Add USB peripheral parts
     usbPeripheral = PeripheralPart()
     V.add(usbPeripheral, threaded=True)
-    V.add(usbPeripheral.getIMUPart(), outputs=['imu'])
-    V.add(usbPeripheral.getDistancePart(), outputs=['distance'])
+    #V.add(usbPeripheral.getIMUPart(), outputs=['imu'])
+    #V.add(usbPeripheral.getDistancePart(), outputs=['distance'])
     # V.add(usbPeripheral.getIMUPart(), outputs=['imu/accel_x', 'imu/accel_y', 'imu/accel_z',
     #                                            'imu/gyro_x', 'imu/gyro_y', 'imu/gyro_z', 
     #                                            'imu/magneto_x', 'imu/magneto_y', 'imu/magneto_z'])
@@ -136,8 +136,12 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle',
-              'user/throttle', 'user/mode', 'timestamp', 'distance', 'imu']
-    types = ['image_array', 'float', 'float',  'str', 'str', 'float', 'float']
+              'user/throttle', 'user/mode', 'timestamp'
+              #, 'distance', 'imu'
+             ]
+    types = ['image_array', 'float', 'float',  'str', 'str'
+            # , 'float', 'float'
+            ]
 
     # multiple tubs
     # th = TubHandler(path=cfg.DATA_PATH)

@@ -455,6 +455,9 @@ class TubWriter(Tub):
         Accepts values, pairs them with their input keys and saves them
         to disk.
         """
+        #print(len(self.inputs), len(args))
+        #print(self.inputs)
+        #print(args)
         assert len(self.inputs) == len(args)
         record = dict(zip(self.inputs, args))
         self.put_record(record)

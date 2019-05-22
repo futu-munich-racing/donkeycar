@@ -17,7 +17,8 @@ class ControlPart:
     def run(self, steering, throttle):
         steering = int(90 + (steering * 60))
         throttle = int(1500 + (throttle * -500))
-        print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
+        if steering != 90 or throttle != 1500:
+            print('Steering: {0}, Throttle: {1}'.format(steering, throttle))
         self._protocol.sendControlPacket(steering, throttle)
 
 
@@ -37,8 +38,8 @@ class IMUSensor:
             self._data['gyro'], self._data['accel'], self._data['magneto'])
 
     def run(self,):
-        print(self._madgwick.quaternion.to_euler_angles())
-        print(self._data)
+        #print(self._madgwick.quaternion.to_euler_angles())
+        #print(self._data)
         return self._data['accel'][0], self._data['accel'][1], self._data['accel'][2], self._data['gyro'][0], self._data['gyro'][1], self._data['gyro'][2], self._data['magneto'][0], self._data['magneto'][1], self._data['magneto'][2]
 
 
