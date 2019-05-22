@@ -17,7 +17,11 @@ class ControlPart:
 class IMUSensor:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
-        self._data = None
+        self._data = {
+            'accel': [0, 0, 0],
+            'gyro': [0, 0, 0],
+            'magneto': [0, 0, 0]
+        }
         self._madgwick = MadgwickAHRS(sampleperiod=1/40)
 
     def updateData(self, data):
@@ -34,7 +38,7 @@ class IMUSensor:
 class DistanceSensor:
     def __init__(self, protocol: Protocol):
         self._protocol = protocol
-        self._data = None
+        self._data = [0, 0, 0]
 
     def updateData(self, data):
         self._data = data
