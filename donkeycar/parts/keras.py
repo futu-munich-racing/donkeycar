@@ -72,10 +72,11 @@ class KerasLinear(KerasPilot):
     def run(self, img_arr):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
         outputs = self.model.predict(img_arr)
-        # print(len(outputs), outputs)
+        #print(len(outputs), outputs)
         steering = outputs[0]
-        throttle = outputs[1]
-        return steering[0][0], throttle[0][0]
+        #print(steering)
+        throttle = 0.1 #outputs[1]
+        return steering[0], 0.05 #throttle[0][0]
 
 
 def default_linear():
