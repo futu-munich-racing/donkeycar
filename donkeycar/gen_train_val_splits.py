@@ -88,7 +88,7 @@ def main():
         
         if len(images) == 0:
             images = glob.glob(os.path.join(tub_dir, 'tub', '*.jpg'))
-            jsons = scan_jsons(tub_dir, 'tub')
+            jsons = scan_jsons(os.path.join(tub_dir, 'tub'))
 
         print(len(images), len(jsons))
         
