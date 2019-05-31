@@ -7,6 +7,13 @@ import glob
 
 import cv2
 
+
+DEFAULT_DIM = (341, 256)
+DEFAULT_K = np.array([[88.68579615592131, 0.0, 168.71152971640518],
+                      [0.0, 89.15882834964788, 129.37399022937905],
+                      [0.0, 0.0, 1.0]])
+DEFAULT_D = np.array([[-0.0427328117588215], [0.09259025148682316], [-0.12141271631637485], [0.04770722474030203]])
+
 class BaseCamera:
 
     def run_threaded(self):
@@ -20,7 +27,6 @@ class PiCamera(BaseCamera):
         # initialize the camera and stream
         self.camera = PiCamera()  # PiCamera gets resolution (height, width)
         self.camera.resolution = resolution
-        self.enable_undistort = enable_undistort
         self.camera.framerate = framerate
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
         self.stream = self.camera.capture_continuous(self.rawCapture,
@@ -63,7 +69,7 @@ class PiCamera(BaseCamera):
         print('done.')
 
 class CalibratedPiCamera(PiCamera):
-    def __init__(self, resolution=(120, 160), framerate=20):
+    def __init__(self, resolution=DEFAULT_DIM, framerate=20):
 
         super.__init__(self, resolution=resolution, framerate=framerate)
 
@@ -73,11 +79,11 @@ class CalibratedPiCamera(PiCamera):
             self.K = np.load(current_dir / 'K.npy')
             self.D = np.load(current_dir / 'D.npy')
         else:
-            self.K = np.array([[262.5149412205487, 0.0, 508.0099923995325], [0.0, 263.37261998594226, 385.2732272977765], [0.0, 0.0, 1.0]])
-            self.D = np.array([[0.00660662191880481], [-0.05660843918571319], [0.051568113347244704], [-0.01791498292443901]])
+            self.K = DEFAULT_D
+            self.D = DEFAULT_K
     
-        self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.K, self.D, np.eye(3), self.K, resolution, cv2.CV_16SC2)
-    
+            self.map1, self.map2 = cv2.fisheye.initUndistortRectifyMap(self.K, self.D, np.eye(3), self.K, resolution, cv2.CV_16SC2)
+        
     def undistort(self, img):
         undistorted_img = cv2.remap(img, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
         return undistorted_img
