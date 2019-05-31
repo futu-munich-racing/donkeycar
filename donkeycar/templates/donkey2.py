@@ -17,7 +17,7 @@ from docopt import docopt
 from donkeycar import load_config
 from donkeycar.vehicle import Vehicle
 
-from donkeycar.parts.camera import PiCamera
+from donkeycar.parts.camera import PiCamera, CalibratedPiCamera
 from donkeycar.parts.transform import Lambda
 from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.actuator import PCA9685, PWMSteering, PWMThrottle
