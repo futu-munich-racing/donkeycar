@@ -46,7 +46,7 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(clock, outputs=['timestamp'])
 
     if cfg.ENABLE_UNDISTORT:
-        cam = CalibratedPiCamera(cfg.CAMERA_RESOLUTION)
+        cam = CalibratedPiCamera(resolution=cfg.CAMERA_RESOLUTION)
     else:
         cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
     

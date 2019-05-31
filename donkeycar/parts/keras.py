@@ -77,6 +77,8 @@ class KerasLinear(KerasPilot):
 
     def run(self, img_arr):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
+        print(img_arr.shape)
+        print(cfg.CAMERA_RESOLUTION)
         outputs = self.model.predict(img_arr)
         # print(len(outputs), outputs)
         steering = outputs #[0]
