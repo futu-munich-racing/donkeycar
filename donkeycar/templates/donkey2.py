@@ -44,12 +44,24 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
+    import sys
+    # Run the pilot if the mode is not user.
+    kl = KerasLinear()
+    if model_path:
+        print('Loading_model...', end='')
+        kl.load(model_path)
+        resolution = kl.model.input_shape[1:3]
+        print(resolution)
+        print('loaded.')
+        sys.exit()
+    else:
+        resolution = cfg.CAMERA_RESOLUTION
 
     if cfg.ENABLE_UNDISTORT:
-        cam = CalibratedPiCamera(resolution=cfg.CAMERA_RESOLUTION)
+        cam = CalibratedPiCamera(resolution=resolution)
     else:
-        cam = PiCamera(resolution=cfg.CAMERA_RESOLUTION)
-    
+        cam = PiCamera(resolution=resolution)
+
     V.add(cam, outputs=['cam/image_array'], threaded=True)
 
     # See if we should even run the pilot module.
@@ -64,12 +76,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(pilot_condition_part,
           inputs=['user/mode'],
           outputs=['run_pilot'])
-    # Run the pilot if the mode is not user.
-    kl = KerasLinear()
-    if model_path:
-        print('Loading_model...', end='')
-        kl.load(model_path)
-        print('loaded.')
     V.add(kl,
           inputs=['cam/image_array'],
           outputs=['pilot/angle', 'pilot/throttle'],
