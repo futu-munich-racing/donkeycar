@@ -23,6 +23,7 @@ class KerasPilot:
     def load(self, model_path):
         K.clear_session()
         self.model = load_model(model_path)
+        self.model.summary()
 
     def shutdown(self):
         pass
@@ -77,13 +78,14 @@ class KerasLinear(KerasPilot):
 
     def run(self, img_arr):
         img_arr = img_arr.reshape((1,) + img_arr.shape)
-        print(img_arr.shape)
-        print(cfg.CAMERA_RESOLUTION)
+        #print(img_arr.shape)
+        #print(cfg.CAMERA_RESOLUTION)
         outputs = self.model.predict(img_arr)
-        # print(len(outputs), outputs)
-        steering = outputs #[0]
-#        throttle = outputs[1]
-        return steering[0][0], 0 #throttle[0][0]
+        #print(len(outputs), outputs)
+        steering = outputs[0]
+        throttle = outputs[1]
+        #print(steering, throttle, steering[0][0], throttle[0][0])
+        return steering[0][0], throttle[0][0]
 
 
 def default_linear():

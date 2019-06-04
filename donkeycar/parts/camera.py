@@ -39,7 +39,7 @@ class PiCamera(BaseCamera):
         self.on = True
 
         print('PiCamera loaded.. .warming camera')
-        time.sleep(5)
+        time.sleep(2)
 
  
     def run(self):
@@ -90,20 +90,19 @@ class CalibratedPiCamera(PiCamera):
                                                                    self.D,
                                                                    np.eye(3),
                                                                    self.K,
-                                                                   resolution,
+                                                                   resolution[::-1],
                                                                    cv2.CV_16SC2)
 
         print('Calibrated camera initialised. Resolution: %dx%d' % self.camera.resolution)
-        
+        time.sleep(2)
+
     def undistort(self, img):
         undistorted_img = cv2.remap(img, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
         return undistorted_img
 
     def run(self):
         f = next(self.stream)
-        frame = f.array
-        print(frame.shape)
-        frame = self.undistort(frame)
+        frame = self.undistort(f.array)
         self.rawCapture.truncate(0)
         
         return frame
@@ -113,9 +112,7 @@ class CalibratedPiCamera(PiCamera):
         for f in self.stream:
             # grab the frame from the stream and clear the stream in
             # preparation for the next frame
-            frame = f.array
-            frame = self.undistort(frame)
-            self.frame = frame
+            self.frame = self.undistort(f.array)
             self.rawCapture.truncate(0)
 
             # if the thread indicator variable is set, stop the thread
