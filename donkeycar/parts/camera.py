@@ -41,7 +41,7 @@ class PiCamera(BaseCamera):
         print('PiCamera loaded.. .warming camera')
         time.sleep(2)
 
- 
+
     def run(self):
         f = next(self.stream)
         frame = f.array
@@ -75,11 +75,15 @@ class CalibratedPiCamera(PiCamera):
 
         print('PiCamera should init shortly after this msg')
         super().__init__(resolution=resolution, framerate=framerate)
-        print('PiCamerea should be initialised')
+        print('PiCamera should be initialised')
 
         # Camera calibration parameters
         current_dir = Path(os.path.dirname(os.path.abspath(__file__)))
-        if False: #(current_dir / 'K.npy').exists() and (current_dir / 'D.npy').exists():
+        w, h = self.camera.resolution
+        print(w,h)
+        K_name = 'K_{w}_{h}.npy'.format(w=w, h=h)
+        D_name = 'D_{w}_{h}.npy'.format(w=w, h=h)
+        if (current_dir / K_name).exists() and (current_dir / D_name).exists():
             self.K = np.load(current_dir / 'K.npy')
             self.D = np.load(current_dir / 'D.npy')
         else:
@@ -105,7 +109,6 @@ class CalibratedPiCamera(PiCamera):
         f = next(self.stream)
         frame = self.undistort(f.array)
         self.rawCapture.truncate(0)
-        
         return frame
 
     def update(self):
