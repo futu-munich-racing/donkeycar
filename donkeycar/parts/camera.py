@@ -93,8 +93,9 @@ class CalibratedPiCamera(PiCamera):
                                                                    resolution[::-1],
                                                                    cv2.CV_16SC2)
 
-        print('Calibrated camera initialised. Resolution: %dx%d' % self.camera.resolution)
+
         time.sleep(2)
+        print('Calibrated camera initialised. Resolution: %dx%d' % self.camera.resolution)
 
     def undistort(self, img):
         undistorted_img = cv2.remap(img, self.map1, self.map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)

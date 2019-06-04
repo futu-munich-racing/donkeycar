@@ -25,7 +25,7 @@ trap "endScript" INT EXIT
 rm -rf templates/tub
 cp -r templates/tub_template templates/tub
 
-# Drtive the car
+# Drive the car
 python templates/donkey2.py drive --js
 
 

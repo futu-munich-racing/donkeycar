@@ -5,16 +5,20 @@ keras.py
 functions to run and train autopilots using keras
 
 """
+import warnings
+warnings.simplefilter(action='ignore')
 
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.models import Model, load_model
 from tensorflow.python.keras.layers import Convolution2D
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense
 from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
+import tensorflow as tf
+from keras import backend as K
 
 from donkeycar import load_config
 
-from keras import backend as K
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 cfg = load_config()
 
@@ -77,15 +81,18 @@ class KerasLinear(KerasPilot):
             self.model = default_linear()
 
     def run(self, img_arr):
+        if img_arr is None:
+            print('Camera not ready yet')
+            return 0.0, 0.0
         img_arr = img_arr.reshape((1,) + img_arr.shape)
         #print(img_arr.shape)
         #print(cfg.CAMERA_RESOLUTION)
         outputs = self.model.predict(img_arr)
         #print(len(outputs), outputs)
         steering = outputs[0]
-        throttle = outputs[1]
+        #throttle = outputs[1]
         #print(steering, throttle, steering[0][0], throttle[0][0])
-        return steering[0][0], throttle[0][0]
+        return steering[0], 0.1 #steering[0][0], throttle[0][0]
 
 
 def default_linear():
