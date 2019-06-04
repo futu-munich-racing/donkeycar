@@ -7,7 +7,7 @@ dist/*
 .ipynb_checkpoints
 *.egg-info/
 .git.bfg-report
-.DS_Store
+**/*.DS_Store
 lag_log.csv
 
 .cache
@@ -21,3 +21,6 @@ build
 .pytest_cache
 
 .coverage
+
+**/tub*
+**/*.zip
