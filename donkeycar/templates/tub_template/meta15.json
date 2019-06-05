@@ -1,0 +1,7 @@
+{"types": ["image_array", "float", "float", "str", "str", "float", "float", "float",
+            "float", "float", "float",
+            "float", "float", "float",
+            "float"], 
+"inputs": ["cam/image_array", "user/angle", "user/throttle", "user/mode", "timestamp", "imu/orient_roll", "imu/orient_pitch", "imu/orient_heading",
+ "imu/rotation_x", "imu/rotation_y", "imu/rotation_z",
+"imu/accel_x", "imu/accel_y", "imu/accel_z", "distance/center"]}
