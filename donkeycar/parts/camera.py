@@ -124,9 +124,8 @@ class CalibratedPiCamera(PiCamera):
         return undistorted_img
 
     def run(self):
-        f = next(self.stream)
-        frame = self.undistort(f.array)
-        self.rawCapture.truncate(0)
+        frame = super().run()
+        frame = self.undistort(frame)
         return frame
 
     def update(self):
