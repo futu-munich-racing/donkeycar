@@ -1,11 +1,9 @@
 import argparse
-import os
-import glob
 import time
 
+import cv2
 import numpy as np
 
-import cv2
 
 def undistort(img, K, D):
     h, w = img.shape[:2]
@@ -48,6 +46,7 @@ def main():
     while key != 27:
         key = cv2.waitKey(100)
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()

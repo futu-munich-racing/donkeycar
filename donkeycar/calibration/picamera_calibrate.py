@@ -1,15 +1,16 @@
 import argparse
-import os
 import glob
-
-import numpy as np
+import os
 
 import cv2
+import numpy as np
+
 assert int(cv2.__version__[0]) > 3, 'The fisheye module requires opencv version >= 3.0.0'
 
 CHECKERBOARD = (6,9)
 subpix_criteria = (cv2.TERM_CRITERIA_EPS+cv2.TERM_CRITERIA_MAX_ITER, 30, 0.1)
 calibration_flags = cv2.fisheye.CALIB_RECOMPUTE_EXTRINSIC+cv2.fisheye.CALIB_CHECK_COND+cv2.fisheye.CALIB_FIX_SKEW
+
 
 def undistort(img, K, D):
     h, w = img.shape[:2]
@@ -18,6 +19,7 @@ def undistort(img, K, D):
     undistorted_img = cv2.remap(img, map1, map2, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
     
     return undistorted_img
+
 
 def main():
 
@@ -84,6 +86,7 @@ def main():
         while key != 27:
             key = cv2.waitKey(100)
         cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()
