@@ -23,10 +23,10 @@ class PiCamera(BaseCamera):
     def __init__(self, resolution=(120, 160), framerate=20, n_history=1):
         from picamera.array import PiRGBArray
         from picamera import PiCamera
-        resolution = (resolution[1], resolution[0])
+        #resolution = (resolution[1], resolution[0])
         # initialize the camera and stream
         self.camera = PiCamera()  # PiCamera gets resolution (height, width)
-        self.camera.resolution = resolution
+        self.camera.resolution = (resolution[1], resolution[0])
         self.camera.framerate = framerate
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
         self.stream = self.camera.capture_continuous(self.rawCapture,
@@ -35,10 +35,9 @@ class PiCamera(BaseCamera):
 
         # initialize the frame and the variable used to indicate
         # if the thread should be stopped
-        #self.frame = None
         self.on = True
 
-        self.frame_history = [None] * n_history
+        self.frame_history = np.empty((n_history, resolution, 3))
         self.last_frame_update = time.time()
         self.history_size = n_history
 
@@ -50,25 +49,27 @@ class PiCamera(BaseCamera):
         f = next(self.stream)
         frame = f.array
         self.rawCapture.truncate(0)
-        return [frame] * self.history_size
+        return self.frame_history
 
     def update(self):
         # keep looping infinitely until the thread is stopped
         for f in self.stream:
             # grab the frame from the stream and clear the stream in
             # preparation for the next frame
-            _frame = f.array
+            _frame = np.array(f.array)
             self.rawCapture.truncate(0)
 
             if time.time() > self.last_frame_update + 1 / self.camera.framerate:
                 # We need to make sure make sure that we have atomic operation that the 
                 # vehicle does not try to read when we are updating the history
 
-                # Add new frame to the 
-                _frame_history = self.frame_history.append(_frame)
-                # Remove the oldest item
-                _ = _frame_history.pop(0)
-                # Update the history
+                # Copy history to a local variable
+                _frame_history = self.frame_history.copy()
+                # Move history by one
+                _frame_history[:1] = _frame_history[-1:]
+                # Add new frame to the history in the beginning
+                _frame_history[0] = _frame
+                # Update the history (which is used when fetching data)
                 self.frame_history = _frame_history
 
             # if the thread indicator variable is set, stop the thread
