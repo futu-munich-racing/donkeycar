@@ -20,7 +20,7 @@ class BaseCamera:
         return self.frame
 
 class PiCamera(BaseCamera):
-    def __init__(self, resolution=(120, 160), framerate=20):
+    def __init__(self, resolution=(120, 160), framerate=20, n_history=1):
         from picamera.array import PiRGBArray
         from picamera import PiCamera
         resolution = (resolution[1], resolution[0])
@@ -35,8 +35,12 @@ class PiCamera(BaseCamera):
 
         # initialize the frame and the variable used to indicate
         # if the thread should be stopped
-        self.frame = None
+        #self.frame = None
         self.on = True
+
+        self.frame_history = [None] * n_history
+        self.last_frame_update = time.time()
+        self.history_size = n_history
 
         print('PiCamera loaded.. .warming camera')
         time.sleep(2)
@@ -46,15 +50,26 @@ class PiCamera(BaseCamera):
         f = next(self.stream)
         frame = f.array
         self.rawCapture.truncate(0)
-        return frame
+        return [frame] * self.history_size
 
     def update(self):
         # keep looping infinitely until the thread is stopped
         for f in self.stream:
             # grab the frame from the stream and clear the stream in
             # preparation for the next frame
-            self.frame = f.array
+            _frame = f.array
             self.rawCapture.truncate(0)
+
+            if time.time() > self.last_frame_update + 1 / self.camera.framerate:
+                # We need to make sure make sure that we have atomic operation that the 
+                # vehicle does not try to read when we are updating the history
+
+                # Add new frame to the 
+                _frame_history = self.frame_history.append(_frame)
+                # Remove the oldest item
+                _ = _frame_history.pop(0)
+                # Update the history
+                self.frame_history = _frame_history
 
             # if the thread indicator variable is set, stop the thread
             if not self.on:
@@ -69,6 +84,9 @@ class PiCamera(BaseCamera):
         self.rawCapture.close()
         self.camera.close()
         print('done.')
+
+    def run_threaded(self):
+        return self.frame_history
 
 class CalibratedPiCamera(PiCamera):
     def __init__(self, resolution=DEFAULT_DIM, framerate=20):
