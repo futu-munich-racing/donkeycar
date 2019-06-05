@@ -18,6 +18,7 @@ from donkeycar import load_config
 from donkeycar.vehicle import Vehicle
 
 from donkeycar.parts.camera import PiCamera, CalibratedPiCamera
+from donkeycar.parts.usbperipheral import PeripheralPart
 from donkeycar.parts.transform import Lambda
 from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.actuator import PCA9685, PWMSteering, PWMThrottle
@@ -28,6 +29,7 @@ from donkeycar.parts.clock import Timestamp
 from donkeycar.parts.datastore import TubGroup, TubWriter
 from donkeycar.parts.keras import KerasLinear
 from donkeycar.parts.transform import Lambda
+
 
 def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     """
@@ -44,6 +46,17 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
+
+    usbPeripheral = PeripheralPart()
+    V.add(usbPeripheral, threaded=True)
+
+    V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
+                                               'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z', 
+                                               'imu/accel_x', 'imu/accel_y', 'imu/accel_z'])
+                                               
+    V.add(usbPeripheral.getDistancePart(), outputs=[
+          'distance/left', 'distance/right', 'distance/center'])
+
     import sys
     # Run the pilot if the mode is not user.
     kl = KerasLinear()
@@ -81,8 +94,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
           outputs=['pilot/angle', 'pilot/throttle'],
           run_condition='run_pilot')
 
-
-
     if use_joystick or cfg.USE_JOYSTICK_AS_DEFAULT:
         ctr = LogitechJoystickController(throttle_scale=cfg.JOYSTICK_MAX_THROTTLE,
                                          steering_scale=cfg.JOYSTICK_STEERING_SCALE,
@@ -98,7 +109,7 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
           outputs=['user/angle', 'user/throttle', 'user/mode', 'recording'],
           threaded=True)
 
-     # Choose what inputs should change the car.
+    # Choose what inputs should change the car.
     def drive_mode(mode,
                    user_angle, user_throttle,
                    pilot_angle, pilot_throttle):
@@ -130,7 +141,8 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(steering, inputs=['angle'])
     V.add(throttle, inputs=['throttle'])
     # add tub to save data
-    inputs = ['cam/image_array', 'user/angle', 'user/throttle', 'user/mode', 'timestamp']
+    inputs = ['cam/image_array', 'user/angle',
+              'user/throttle', 'user/mode', 'timestamp']
     types = ['image_array', 'float', 'float',  'str', 'str']
 
     # multiple tubs
@@ -188,7 +200,8 @@ if __name__ == '__main__':
     cfg = load_config()
 
     if args['drive']:
-        drive(cfg, model_path=args['--model'], use_joystick=args['--js'], use_chaos=args['--chaos'])
+        drive(cfg, model_path=args['--model'],
+              use_joystick=args['--js'], use_chaos=args['--chaos'])
 
     elif args['train']:
         tub = args['--tub']
