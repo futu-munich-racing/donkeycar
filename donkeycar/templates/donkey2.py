@@ -47,7 +47,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
 
-
     #######################################################################################################
     ## CUSTOM PART BEGIN ##################################################################################
     #######################################################################################################
@@ -56,12 +55,11 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(usbPeripheral, threaded=True)
 
     V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
-                                               'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z', 
+                                               'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
                                                'imu/accel_x', 'imu/accel_y', 'imu/accel_z'])
 
     V.add(usbPeripheral.getDistancePart(), outputs=[
           'distance/left', 'distance/right', 'distance/center'])
-
 
     #######################################################################################################
     ## CUSTOM PART END ####################################################################################
@@ -152,8 +150,16 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(throttle, inputs=['throttle'])
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle',
-              'user/throttle', 'user/mode', 'timestamp']
-    types = ['image_array', 'float', 'float',  'str', 'str']
+              'user/throttle', 'user/mode', 'timestamp',
+              'imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
+              'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
+              'imu/accel_x', 'imu/accel_y', 'imu/accel_z',
+              'distance/center']
+    types = ['image_array', 'float', 'float',  'str', 'str',
+             'float', 'float', 'float',
+             'float', 'float', 'float',
+             'float', 'float', 'float',
+             'float']
 
     # multiple tubs
     # th = TubHandler(path=cfg.DATA_PATH)
