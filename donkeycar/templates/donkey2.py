@@ -47,15 +47,25 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     clock = Timestamp()
     V.add(clock, outputs=['timestamp'])
 
+
+    #######################################################################################################
+    ## CUSTOM PART BEGIN ##################################################################################
+    #######################################################################################################
+
     usbPeripheral = PeripheralPart()
     V.add(usbPeripheral, threaded=True)
 
     V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
                                                'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z', 
                                                'imu/accel_x', 'imu/accel_y', 'imu/accel_z'])
-                                               
+
     V.add(usbPeripheral.getDistancePart(), outputs=[
           'distance/left', 'distance/right', 'distance/center'])
+
+
+    #######################################################################################################
+    ## CUSTOM PART END ####################################################################################
+    #######################################################################################################
 
     import sys
     # Run the pilot if the mode is not user.
