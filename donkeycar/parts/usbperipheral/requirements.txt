@@ -1,0 +1,4 @@
+pyserial==3.4
+hexdump==3.3
+sliplib==0.3.0
+pyserial-asyncio==0.4
