@@ -7,7 +7,7 @@ DATESTR=$(date +%Y-%m-%d_%H%M)
 FILENAME=tub_$DATESTR.zip
 echo "zipping files to " $FILENAME
 mkdir -p data
-zip -q -r data/$FILENAME templates/tub
+zip -q -rD ../data/$FILENAME templates/tub/*
 
 echo "Moving recorded data to old_tubs_please_delete/$DATESTR/"
 mkdir -p old_tubs_please_delete/$DATESTR/
