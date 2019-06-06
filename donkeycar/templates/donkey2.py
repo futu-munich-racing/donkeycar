@@ -51,15 +51,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     ## CUSTOM PART BEGIN ##################################################################################
     #######################################################################################################
 
-    usbPeripheral = PeripheralPart()
-    V.add(usbPeripheral, threaded=True)
-
-    V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
-                                               'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
-                                               'imu/accel_x', 'imu/accel_y', 'imu/accel_z'])
-
-    V.add(usbPeripheral.getDistancePart(), outputs=[
-          'distance/left', 'distance/right', 'distance/center'])
 
     #######################################################################################################
     ## CUSTOM PART END ####################################################################################
@@ -74,7 +65,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
         resolution = kl.model.input_shape[1:3]
         print(resolution)
         print('loaded.')
-        sys.exit()
     else:
         resolution = cfg.CAMERA_RESOLUTION
 
@@ -150,16 +140,8 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     V.add(throttle, inputs=['throttle'])
     # add tub to save data
     inputs = ['cam/image_array', 'user/angle',
-              'user/throttle', 'user/mode', 'timestamp',
-              'imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
-              'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
-              'imu/accel_x', 'imu/accel_y', 'imu/accel_z',
-              'distance/center']
-    types = ['image_array', 'float', 'float',  'str', 'str',
-             'float', 'float', 'float',
-             'float', 'float', 'float',
-             'float', 'float', 'float',
-             'float']
+              'user/throttle', 'user/mode', 'timestamp']
+    types = ['image_array', 'float', 'float',  'str', 'str']
 
     # multiple tubs
     # th = TubHandler(path=cfg.DATA_PATH)
