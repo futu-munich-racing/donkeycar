@@ -50,15 +50,15 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     #######################################################################################################
     ## CUSTOM PART BEGIN ##################################################################################
     #######################################################################################################
-    if cfg.EXTRA_SENSORS:
-        usbPeripheral = PeripheralPart()
-        V.add(usbPeripheral, threaded=True)
 
-        V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
+    usbPeripheral = PeripheralPart()
+    V.add(usbPeripheral, threaded=True)
+
+    V.add(usbPeripheral.getIMUPart(), outputs=['imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
                                                'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
                                                'imu/accel_x', 'imu/accel_y', 'imu/accel_z'])
 
-        V.add(usbPeripheral.getDistancePart(), outputs=[
+    V.add(usbPeripheral.getDistancePart(), outputs=[
           'distance/left', 'distance/right', 'distance/center'])
 
     #######################################################################################################
@@ -67,16 +67,14 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
 
     import sys
     # Run the pilot if the mode is not user.
-    
+    kl = KerasLinear()
     if model_path:
         print('Loading_model...', end='')
-        kl = KerasLinear(model_path)
-        #kl.load(model_path)
-        resolution = kl.model.input_shape[1:3]
+        kl.load(model_path)
+        resolution = kl.model.input_shape[2:4]
         print(resolution)
         print('loaded.')
     else:
-        kl = KerasLinear()
         resolution = cfg.CAMERA_RESOLUTION
 
     if cfg.ENABLE_UNDISTORT:
@@ -153,16 +151,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
     inputs = ['cam/image_array', 'user/angle',
               'user/throttle', 'user/mode', 'timestamp']
     types = ['image_array', 'float', 'float',  'str', 'str']
-    if cfg.EXTRA_SENSORS:
-        inputs += [
-              'imu/orient_roll', 'imu/orient_pitch', 'imu/orient_heading',
-              'imu/rotation_x', 'imu/rotation_y', 'imu/rotation_z',
-              'imu/accel_x', 'imu/accel_y', 'imu/accel_z',
-              'distance/center']
-        types += [ 'float', 'float', 'float',
-             'float', 'float', 'float',
-             'float', 'float', 'float',
-             'float']
 
     # multiple tubs
     # th = TubHandler(path=cfg.DATA_PATH)
