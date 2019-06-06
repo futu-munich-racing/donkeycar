@@ -74,7 +74,6 @@ def drive(cfg, model_path=None, use_joystick=False, use_chaos=False):
         resolution = kl.model.input_shape[1:3]
         print(resolution)
         print('loaded.')
-        sys.exit()
     else:
         resolution = cfg.CAMERA_RESOLUTION
 
