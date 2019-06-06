@@ -10,7 +10,7 @@ warnings.simplefilter(action='ignore')
 
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.models import Model, load_model
-from tensorflow.python.keras.layers import Convolution2D
+from tensorflow.python.keras.layers import Convolution2D, Convolution3D
 from tensorflow.python.keras.layers import Dropout, Flatten, Dense
 from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
 import tensorflow as tf
@@ -73,8 +73,8 @@ class KerasPilot:
 class KerasLinear(KerasPilot):
     def __init__(self, model=None, num_outputs=None, *args, **kwargs):
         super(KerasLinear, self).__init__(*args, **kwargs)
-        if model:
-            self.model = model
+        if type(model) == str:
+            self.load(model)
         elif num_outputs is not None:
             self.model = default_linear()
         else:
@@ -96,21 +96,25 @@ class KerasLinear(KerasPilot):
 
 
 def default_linear():
-    img_in = Input(shape=(*cfg.CAMERA_RESOLUTION, 3), name='img_in')
+    img_in = Input(shape=(cfg.CAMERA_HISTORY, *cfg.CAMERA_RESOLUTION, 3), name='img_in')
+
     x = img_in
 
-    # Convolution2D class name is an alias for Conv2D
-    x = Convolution2D(filters=24, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
-    x = Convolution2D(filters=32, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
-    x = Convolution2D(filters=64, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
-    x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu')(x)
-    x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(1, 1), activation='relu')(x)
+    # Define convolutional neural network to extract features from the images
+    x = Convolution3D(filters=8, kernel_size=(3, 5, 5), strides=(1, 2, 2), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 5, 5), strides=(1, 2, 2), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 5, 5), strides=(1, 2, 2), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 3, 3), strides=(1, 2, 2), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 3, 3), strides=(1, 1, 1), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 3, 3), strides=(1, 1, 1), activation='relu')(x)
+    x = Convolution3D(filters=8, kernel_size=(1, 3, 3), strides=(1, 1, 1), activation='relu')(x)
 
+    # Define decision layers to predict steering and throttle
     x = Flatten(name='flattened')(x)
     x = Dense(units=100, activation='linear')(x)
-    x = Dropout(rate=.1)(x)
+    x = Dropout(rate=.5)(x)
     x = Dense(units=50, activation='linear')(x)
-    x = Dropout(rate=.1)(x)
+    x = Dropout(rate=.5)(x)
     # categorical output of the angle
     angle_out = Dense(units=1, activation='linear', name='angle_out')(x)
 
@@ -118,6 +122,8 @@ def default_linear():
     throttle_out = Dense(units=1, activation='linear', name='throttle_out')(x)
 
     model = Model(inputs=[img_in], outputs=[angle_out, throttle_out])
+
+    model.summary()
 
     model.compile(optimizer='adam',
                   loss={'angle_out': 'mean_squared_error',

@@ -23,10 +23,10 @@ class PiCamera(BaseCamera):
     def __init__(self, resolution=(120, 160), framerate=20, n_history=1):
         from picamera.array import PiRGBArray
         from picamera import PiCamera
-        #resolution = (resolution[1], resolution[0])
+        resolution = (resolution[1], resolution[0])
         # initialize the camera and stream
-        self.camera = PiCamera()  # PiCamera gets resolution (height, width)
-        self.camera.resolution = (resolution[1], resolution[0])
+        self.camera = PiCamera()  # PiCamera gets resolution (height, width) ?? Teemu: "I think that it is w x h"
+        self.camera.resolution =  resolution
         self.camera.framerate = framerate
         self.rawCapture = PiRGBArray(self.camera, size=resolution)
         self.stream = self.camera.capture_continuous(self.rawCapture,
@@ -36,8 +36,9 @@ class PiCamera(BaseCamera):
         # initialize the frame and the variable used to indicate
         # if the thread should be stopped
         self.on = True
-
-        self.frame_history = np.empty((n_history, resolution, 3))
+        print(resolution)
+        self.frame_history = np.empty((n_history, resolution[1], resolution[0], 3))
+        print(self.frame_history.shape)
         self.last_frame_update = time.time()
         self.history_size = n_history
 
