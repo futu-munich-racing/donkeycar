@@ -1,7 +1,8 @@
 - step:
     name: preprocess
+    image: tensorflow/tensorflow:1.13.1-gpu-py3
     command: preprocess.sh
-
+    
 - step:
     name: training
     image: tensorflow/tensorflow:1.13.1-gpu-py3
