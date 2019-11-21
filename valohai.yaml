@@ -1,4 +1,11 @@
 - step:
-    name: mytest
-    image: python:3.6
-    command: python test.py
+    name: preprocess
+    command: preprocess.sh
+
+- step:
+    name: training
+    image: tensorflow/tensorflow:1.13.1-gpu-py3
+    command: python train.py
+    inputs:
+        - name: training-set
+        - name: validation-set
