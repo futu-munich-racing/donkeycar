@@ -11,9 +11,6 @@ Original file is located at
 import glob, os, json
 
 import numpy as np
-import pylab
-
-from tqdm import tqdm, tqdm_notebook
 
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.models import Model, load_model
