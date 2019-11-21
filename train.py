@@ -355,7 +355,7 @@ def train(params):
 
   """### Generate dataframes from train and validation datadirs"""
 
-  train_records = load_tub_data_to_records'data/train/')
+  train_records = load_tub_data_to_records('data/train/')
 
   val_records = load_tub_data_to_records('data/val')
   
