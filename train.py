@@ -399,7 +399,7 @@ def train(params):
                             verbose=verbose,
                             mode='auto')
       
-  model = create_super_simple_2d_model(img_dims, crop_margin_from_top=int(img_dims[0]/5))
+  model = create_2d_model(img_dims, crop_margin_from_top=int(img_dims[0]/5))
 
   history = model.fit_generator(generator=train_generator,
                                 validation_data=val_generator,
