@@ -1,0 +1,4 @@
+- step:
+    name: mytest
+    image: python:3.6
+    command: python test.py
