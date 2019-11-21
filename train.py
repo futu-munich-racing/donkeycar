@@ -266,8 +266,8 @@ def create_2d_model(img_dims, crop_margin_from_top=80):
   model.compile(optimizer='adam',
                 loss={'angle_out': 'mean_squared_error',
                       'throttle_out': 'mean_squared_error'},
-                loss_weights={'angle_out': weight_loss_angle,
-                              'throttle_out': weight_loss_throttle},
+                loss_weights={'angle_out': 0.9,
+                              'throttle_out': 0.1},
                 metrics=['mse', 'mae', 'mape'])
   
   return model
