@@ -8,7 +8,6 @@ Original file is located at
 
 # Training a model for donkey car
 """
-import pandas as pd
 import glob, os, json
 
 import numpy as np
@@ -33,10 +32,10 @@ print('keras: ', keras.__version__)
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
-    def __init__(self, df, data_dir, batch_size=32, img_dim=(256, 360),
+    def __init__(self, records, data_dir, batch_size=32, img_dim=(256, 360),
                  grayscale=False, n_history=1, shuffle=False):
         'Initialization'
-        self.df = df # DataFrame
+        self.records = records # List of dictionaries
         self.data_dir = data_dir # Directory containing datas
         self.batch_size = batch_size 
         self.img_dim = img_dim
@@ -47,7 +46,7 @@ class DataGenerator(keras.utils.Sequence):
 
     def __len__(self):
         'Denotes the number of batches per epoch'
-        return int(np.floor(self.df.shape[0] / self.batch_size))
+        return int(np.floor(len(self.records) / self.batch_size))
 
     def __getitem__(self, index):
         'Generate one batch of data'
@@ -79,7 +78,7 @@ class DataGenerator(keras.utils.Sequence):
         for i, ix in enumerate(indexes):
           if self.n_history == 1:
             img = load_img(os.path.join(self.data_dir,
-                                        self.df.img_path.values[ix]),
+                                        self.records[ix]['img_path']),
                                    grayscale = False, #self.grayscale,
                                    target_size = self.img_dim[:2])
             X[i, ] = img
@@ -89,46 +88,45 @@ class DataGenerator(keras.utils.Sequence):
               img_ix = max(ix - j, 0)
               # Store sample
               img = load_img(os.path.join(self.data_dir,
-                                                self.df.img_path.values[img_ix]),
+                                                self.records[ix]['img_path']),
                                    grayscale = False, #self.grayscale,
                                    target_size = self.img_dim[:2])
               X[i, j, :, :] = img
           # Store class
-          y1[i] = self.df['user/angle'].values[ix]
-          y2[i] = self.df['user/throttle'].values[ix]
+          y1[i] = self.records[ix]['user/angle']
+          y2[i] = self.records[ix]['user/throttle']
 
         return X, [y1, y2]
       
-def load_tub_data_to_df(data_dir):
-    tub_dirs = glob.glob(os.path.join(data_dir, 'tub*'))
-    tub_dirs.sort()
-    tub_dirs = [tub_dir for tub_dir in tub_dirs]
-    print(tub_dirs)
-    records = []
-    for tub_dir in tub_dirs:
-        json_files = glob.glob(os.path.join(tub_dir, 'record_*.json'))
-        if len(json_files) == 0:
-            tub_dir = os.path.join(tub_dir, 'tub')
-            json_files = glob.glob(os.path.join(tub_dir, 'record_*.json'))
-        n = len(json_files)
-        #for json_file in json_files:
-        #for i in range(0, n):
-        i = 0
-        cnt = 0
-        while cnt < n:
-            json_file = os.path.join(tub_dir, 'record_%d.json' % i)
-            #print(json_file)
-            try:
-                data = json.load(open(json_file, 'r'))
-                data['img_path'] = os.path.join(os.path.basename(tub_dir), data['cam/image_array'])
-                records.append(data)
-                cnt += 1
-            except:
-                #print('file missing: %s' % json_file)
-                pass
-            i += 1
-
-    return pd.DataFrame.from_records(records)
+def load_tub_data_to_records(data_dir):
+  tub_dirs = glob.glob(os.path.join(data_dir, 'tub*'))
+  tub_dirs.sort()
+  tub_dirs = [tub_dir for tub_dir in tub_dirs]
+  print(tub_dirs)
+  records = []
+  for tub_dir in tub_dirs:
+      json_files = glob.glob(os.path.join(tub_dir, 'record_*.json'))
+      if len(json_files) == 0:
+          tub_dir = os.path.join(tub_dir, 'tub')
+          json_files = glob.glob(os.path.join(tub_dir, 'record_*.json'))
+      n = len(json_files)
+      #for json_file in json_files:
+      #for i in range(0, n):
+      i = 0
+      cnt = 0
+      while cnt < n:
+          json_file = os.path.join(tub_dir, 'record_%d.json' % i)
+          #print(json_file)
+          try:
+              data = json.load(open(json_file, 'r'))
+              data['img_path'] = os.path.join(os.path.basename(tub_dir), data['cam/image_array'])
+              records.append(data)
+              cnt += 1
+          except:
+              #print('file missing: %s' % json_file)
+              pass
+          i += 1
+  return records
 
 """## Define model"""
 
@@ -330,7 +328,7 @@ def create_super_simple_2d_model(img_dims, crop_margin_from_top=80):
 def train(params):
 
   datadir = 'data/'
-  
+
   model_file_name = "23_tampere_super_simple" #@param {type:"string"}
 
   image_width = 180 #@param {type:"slider", min:32, max:1024, step:1}
