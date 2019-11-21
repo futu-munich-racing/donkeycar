@@ -2,7 +2,10 @@
     name: preprocess
     image: tensorflow/tensorflow:1.13.1-gpu-py3
     command: preprocess.sh
-    
+    inputs:
+        - name: training-set
+        - name: validation-set
+s    
 - step:
     name: training
     image: tensorflow/tensorflow:1.13.1-gpu-py3
