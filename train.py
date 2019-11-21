@@ -8,38 +8,6 @@ Original file is located at
 
 # Training a model for donkey car
 """
-
-#@title Input arguments for training { run: "auto", vertical-output: true }
-datadir = "/content/gdrive/Shared drives/All Futurice/Tribes/Munich/Internal Projects/03_Self-driving_Project_X/data/" #@param {type:"string"}
-relative_input_dir = "real_data/Tampere" #@param {type:"string"}
-model_file_name = "23_tampere_super_simple" #@param {type:"string"}
-
-image_width = 180 #@param {type:"slider", min:32, max:1024, step:1}
-image_height = 120 #@param {type:"slider", min:32, max:1024, step:1}
-image_colours = True #@param {type:"boolean"}
-n_images_in_history = 1 #@param {type:"slider", min:1, max:10, step:1}
-
-epochs = 100 #@param {type:"slider", min:1, max:1000, step:1}
-#steps = 100 #@param {type:"slider", min:1, max:1000, step:1}
-batch_size = 128 #@param {type:"slider", min:32, max:1024, step:2}
-
-verbose = True #@param {type:"boolean"}
-min_delta = .0005 #@param {type:"slider", min:0, max:1, step:0.00001}
-patience = 5 #@param {type:"slider", min:2, max:10, step:1}
-use_early_stop=True #@param {type:"boolean"}
-
-weight_loss_angle = 1 #@param {type:"slider", min:0, max:1, step:0.1}
-weight_loss_throttle = 0 #@param {type:"slider", min:0, max:1, step:0.1}
-
-
-# Fix image dim parameters
-if image_colours:
-  img_dims = (image_height, image_width, 3)
-else:
-  img_dims = (image_height, image_width, 1)
-
-"""## Import important libraries :)"""
-
 import pandas as pd
 import glob, os, json
 
@@ -62,23 +30,6 @@ print('tensorflow: ', tf.__version__)
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import load_img
 print('keras: ', keras.__version__)
-
-from google.colab import drive
-
-drive.mount('/content/gdrive')
-
-"""### Define more important stuff"""
-
-pylab.rcParams['figure.figsize'] = [12, 8]
-
-"""## Helper functions
-
-### DataGenerator
-Reads recorded images and data (jsons) from disk and feeds the neural network
-
-### load_tub_to_df
-Loads jsons to a dataframe so that we can generate batches of data for training and validation
-"""
 
 class DataGenerator(keras.utils.Sequence):
     'Generates data for Keras'
@@ -378,6 +329,34 @@ def create_super_simple_2d_model(img_dims, crop_margin_from_top=80):
 
 def train(params):
 
+  datadir = 'data/'
+  
+  model_file_name = "23_tampere_super_simple" #@param {type:"string"}
+
+  image_width = 180 #@param {type:"slider", min:32, max:1024, step:1}
+  image_height = 120 #@param {type:"slider", min:32, max:1024, step:1}
+  image_colours = True #@param {type:"boolean"}
+  n_images_in_history = 1 #@param {type:"slider", min:1, max:10, step:1}
+
+  epochs = 100 #@param {type:"slider", min:1, max:1000, step:1}
+  steps = 100 #@param {type:"slider", min:1, max:1000, step:1}
+  batch_size = 128 #@param {type:"slider", min:32, max:1024, step:2}
+
+  verbose = True #@param {type:"boolean"}
+  min_delta = .0005 #@param {type:"slider", min:0, max:1, step:0.00001}
+  patience = 5 #@param {type:"slider", min:2, max:10, step:1}
+  use_early_stop=True #@param {type:"boolean"}
+
+  weight_loss_angle = 1 #@param {type:"slider", min:0, max:1, step:0.1}
+  weight_loss_throttle = 0 #@param {type:"slider", min:0, max:1, step:0.1}
+
+
+  # Fix image dim parameters
+  if image_colours:
+    img_dims = (image_height, image_width, 3)
+  else:
+    img_dims = (image_height, image_width, 1)
+
   """### Generate dataframes from train and validation datadirs"""
 
   traindf = load_tub_data_to_df('data/train/')
@@ -406,25 +385,25 @@ def train(params):
                                 n_history=n_images_in_history,
                                 shuffle=False)
 
-"""### ModelCheckpoint and EarlyStop"""
+  """### ModelCheckpoint and EarlyStop"""
 
-saved_model_path = os.path.join(datadir, 'models', model_file_name)
+  saved_model_path = os.path.join(datadir, 'models', model_file_name)
 
-print('model will be stored to: %s' % saved_model_path)
+  print('model will be stored to: %s' % saved_model_path)
 
-# checkpoint to save model after each epoch
-save_best = ModelCheckpoint(saved_model_path,
+  # checkpoint to save model after each epoch
+  save_best = ModelCheckpoint(saved_model_path,
                             monitor='val_loss',
                             verbose=verbose,
                             save_best_only=True,
                             mode='min')
 
-# stop training if the validation error stops improving.
-early_stop = EarlyStopping(monitor='val_loss',
-                           min_delta=min_delta,
-                           patience=patience,
-                           verbose=verbose,
-                           mode='auto')
+  # stop training if the validation error stops improving.
+  early_stop = EarlyStopping(monitor='val_loss',
+                            min_delta=min_delta,
+                            patience=patience,
+                            verbose=verbose,
+                            mode='auto')
       
   model = create_super_simple_2d_model(img_dims, crop_margin_from_top=int(img_dims[0]/5))
 
