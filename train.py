@@ -58,7 +58,7 @@ class DataGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
-        self.indexes = np.arange(self.df.shape[0])
+        self.indexes = np.arange(len(self.records))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
 
@@ -355,17 +355,15 @@ def train(params):
 
   """### Generate dataframes from train and validation datadirs"""
 
-  traindf = load_tub_data_to_df('data/train/')
-  print(traindf.shape)
-  traindf.head()
+  train_records = load_tub_data_to_records'data/train/')
 
-  valdf = load_tub_data_to_df('data/val')
-  print(valdf.shape)
-  valdf.head()
+  val_records = load_tub_data_to_records('data/val')
+  
+  print(len(train_records), len(train_records))
 
   """### Data generators"""
 
-  train_generator = DataGenerator(traindf,
+  train_generator = DataGenerator(train_records,
                                   data_dir='data/train',
                                   batch_size=batch_size,
                                   img_dim=img_dims,
@@ -373,7 +371,7 @@ def train(params):
                                   n_history=n_images_in_history,
                                   shuffle=True)
 
-  val_generator = DataGenerator(valdf,
+  val_generator = DataGenerator(val_records,
                                 data_dir='data/val',
                                 batch_size=batch_size,
                                 img_dim=img_dims,
