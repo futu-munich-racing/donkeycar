@@ -100,7 +100,7 @@ def decode_img(img, target_size):
   # Use `convert_image_dtype` to convert to floats in the [0,1] range.
   img = tf.image.convert_image_dtype(img, tf.float32)
   # resize the image to the desired size.
-  return tf.image.resize(img, [target_size[1], target_size[0]])
+  return tf.image.resize(img, [target_size[1], target_size[0]]).numpy()
 
 def load_tub_data_to_records(data_dir):
   tub_dirs = glob.glob(os.path.join(data_dir, 'tub*'))
