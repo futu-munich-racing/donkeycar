@@ -75,10 +75,9 @@ class DataGenerator(keras.utils.Sequence):
         # Generate data
         for i, ix in enumerate(indexes):
           if self.n_history == 1:
-            img = load_img(os.path.join(self.data_dir,
-                                        self.records[ix]['img_path']),
-                                   grayscale = False, #self.grayscale,
-                                   target_size = self.img_dim[:2])
+            img = tf.io.read_file(os.path.join(self.data_dir,
+                                              self.records[ix]['img_path']))
+            img = decode_img(img, self.img_dim[:2])
             X[i, ] = img
           else:
             # TODO: In the future, we need to have history of images here
