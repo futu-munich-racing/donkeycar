@@ -84,18 +84,25 @@ class DataGenerator(keras.utils.Sequence):
             # TODO: In the future, we need to have history of images here
             for j in range(0, self.n_history):
               img_ix = max(ix - j, 0)
-              # Store sample
-              img = load_img(os.path.join(self.data_dir,
-                                                self.records[ix]['img_path']),
-                                   grayscale = False, #self.grayscale,
-                                   target_size = self.img_dim[:2])
+              # Store sample  
+              img = tf.io.read_file(os.path.join(self.data_dir,
+                                                self.records[ix]['img_path']))
+              img = decode_img(img, self.img_dim[:2])
               X[i, j, :, :] = img
           # Store class
           y1[i] = self.records[ix]['user/angle']
           y2[i] = self.records[ix]['user/throttle']
 
         return X, [y1, y2]
-      
+
+def decode_img(img, target_size):
+  # convert the compressed string to a 3D uint8 tensor
+  img = tf.image.decode_jpeg(img, channels=3)
+  # Use `convert_image_dtype` to convert to floats in the [0,1] range.
+  img = tf.image.convert_image_dtype(img, tf.float32)
+  # resize the image to the desired size.
+  return tf.image.resize(img, [target_size[1], target_size[0]])
+
 def load_tub_data_to_records(data_dir):
   tub_dirs = glob.glob(os.path.join(data_dir, 'tub*'))
   tub_dirs.sort()
