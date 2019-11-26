@@ -158,13 +158,15 @@ if __name__ == '__main__':
                                                             'train.tfrecord'))
     parsed_trainset = raw_trainset.map(_parse_fn)
 
+    # Read validation dataset
     raw_validationset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'validation-set',
                                                             'val.tfrecord'))
-    parsed_validationset = raw_validationset.map(_parse_fn)
+    parsed_validationset = raw_trainset.map(_parse_fn)
 
+    #
     ## Training the car
-
+    #
 
     weight_loss_angle = 0.9
     weight_loss_throttle = 0.1
