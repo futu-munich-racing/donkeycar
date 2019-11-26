@@ -204,7 +204,10 @@ if __name__ == '__main__':
             batch_size=BATCH_SIZE,
             epochs=EPOCHS)
 
-    model.save('/valohai/outputs/%s_final.h5' % MODEL_NAME)
+    outputs_dir = os.getenv('VH_OUTPUTS_DIR', './')
+    output_file = os.path.join(outputs_dir, '%s_final_final.h5' % MODEL_NAME)
+    print('Saving model to %s' % output_file)
+    model.save(output_file)
 
 
 
