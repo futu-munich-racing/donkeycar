@@ -132,6 +132,10 @@ def create_2d_model(img_dims, crop_margin_from_top=80):
 
     return model
 
+class JsonLogger(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        print(dict({'loss': logs['loss'], 'val_loss': logs['val_loss']}))
+
 if __name__ == '__main__':
     #use_valohai_input()
 
@@ -195,7 +199,9 @@ if __name__ == '__main__':
             steps_per_epoch = NUM_TRAIN_SAMPLES // BATCH_SIZE,
             validation_steps = NUM_VAL_SAMPLES // BATCH_SIZE,
             batch_size=BATCH_SIZE,
-            epochs=EPOCHS)
+            epochs=EPOCHS,
+            callbacks=[JsonLogger()],
+            verbose=0)
 
     outputs_dir = os.getenv('VH_OUTPUTS_DIR', './')
     output_file = os.path.join(outputs_dir, '%s_final.h5' % MODEL_NAME)
