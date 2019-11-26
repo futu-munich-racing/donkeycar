@@ -23,8 +23,6 @@
           type: integer
         - name: num-validation-samples
           type: integer
-        - name: verbose
-          type: flag
         - name: batch-size
           type: integer
           default: 256

@@ -145,8 +145,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--num-training-samples', type=int)
     parser.add_argument('--num-validation-samples', type=int)
-
-    parser.add_argument('--verbose', type=bool, default=VERBOSE)
     
     parser.add_argument('--batch-size', type=int, default=BATCH_SIZE)
     parser.add_argument('--epochs', type=int, default=EPOCHS)
@@ -187,7 +185,7 @@ if __name__ == '__main__':
     # checkpoint to save model after each epoch
     save_best = ModelCheckpoint(output_file,
                                 monitor='val_loss',
-                                verbose=cli_parameters.verbose,
+                                verbose=VERBOSE,
                                 save_best_only=True,
                                 mode='min')
 
@@ -195,7 +193,7 @@ if __name__ == '__main__':
     early_stop = EarlyStopping(monitor='val_loss',
                             min_delta=cli_parameters.min_delta,
                             patience=cli_parameters.patience,
-                            verbose=cli_parameters.patience,
+                            verbose=VERBOSE,
                             mode='auto')
 
     # Train the car
