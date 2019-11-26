@@ -3,6 +3,8 @@
 
 import argparse
 import os
+import datetime
+
 import tensorflow as tf
 tf.enable_eager_execution()
 
@@ -99,26 +101,17 @@ def create_2d_model(img_dims, crop_margin_from_top=80):
     x = Cropping2D(((crop_margin_from_top, 0), (0, 0)))(x)
 
     # Define convolutional neural network to extract features from the images
-    x = Convolution2D(filters=24, kernel_size=(5, 5), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Convolution2D(filters=24, kernel_size=(3, 3), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Convolution2D(filters=24, kernel_size=(3, 3), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Convolution2D(filters=24, kernel_size=(3, 3), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Convolution2D(filters=24, kernel_size=(3, 3), activation='relu')(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    #x = Convolution2D(filters=32, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
-    #x = Convolution2D(filters=64, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
-    #x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu')(x)
-    #x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(1, 1), activation='relu')(x)
+    x = Convolution2D(filters=24, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
+    x = Convolution2D(filters=32, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
+    x = Convolution2D(filters=64, kernel_size=(5, 5), strides=(2, 2), activation='relu')(x)
+    x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(2, 2), activation='relu')(x)
+    x = Convolution2D(filters=64, kernel_size=(3, 3), strides=(1, 1), activation='relu')(x)
 
     # Define decision layers to predict steering and throttle
     x = Flatten(name='flattened')(x)
-    #x = Dense(units=100, activation='linear')(x)
-    #x = Dropout(rate=.5)(x)
-    x = Dense(units=10, activation='linear')(x)
+    x = Dense(units=100, activation='linear')(x)
+    x = Dropout(rate=.5)(x)
+    x = Dense(units=50, activation='linear')(x)
     x = Dropout(rate=.5)(x)
     # categorical output of the angle
     angle_out = Dense(units=1, activation='linear', name='angle_out')(x)
@@ -132,9 +125,9 @@ def create_2d_model(img_dims, crop_margin_from_top=80):
 
     model.compile(optimizer='adam',
                 loss={'angle_out': 'mean_squared_error',
-                      'throttle_out': 'mean_squared_error'},
+                        'throttle_out': 'mean_squared_error'},
                 loss_weights={'angle_out': weight_loss_angle,
-                              'throttle_out': weight_loss_throttle},
+                                'throttle_out': weight_loss_throttle},
                 metrics=['mse', 'mae', 'mape'])
 
     return model
@@ -156,15 +149,15 @@ if __name__ == '__main__':
 
     # Read training set
     inputs_dir = os.getenv('VH_INPUTS_DIR', '/')
-    raw_image_dataset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
+    raw_trainset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'training-set',
                                                             'train.tfrecord'))
-    parsed_image_dataset = raw_image_dataset.map(_parse_fn)
+    parsed_trainset = raw_trainset.map(_parse_fn)
 
-    raw_validation_set = tf.data.TFRecordDataset(os.path.join(inputs_dir,
+    raw_validationset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'validation-set',
                                                             'validation.tfrecord'))
-    parsed_validation_set = raw_image_dataset.map(_parse_fn)
+    parsed_validationset = raw_validationset.map(_parse_fn)
 
     ## Training the car
 
@@ -197,15 +190,19 @@ if __name__ == '__main__':
                             mode='auto')
 
     # Train the car
-    model.fit(parsed_image_dataset,
-            validation_data = parsed_image_dataset,
+    model.fit(parsed_trainset,
+            validation_data = parsed_validationset,
             steps_per_epoch = NUM_TRAIN_SAMPLES // BATCH_SIZE,
             validation_steps = NUM_VAL_SAMPLES // BATCH_SIZE,
             batch_size=BATCH_SIZE,
             epochs=EPOCHS)
 
     outputs_dir = os.getenv('VH_OUTPUTS_DIR', './')
-    output_file = os.path.join(outputs_dir, '%s_final_final.h5' % MODEL_NAME)
+    output_file = os.path.join(outputs_dir, '%s_final.h5' % MODEL_NAME)
+    if os.path.exists(output_file):
+        output_file = os.path.join(outputs_dir, '%s_final_%s.h5' % (MODEL_NAME,
+                                                                    datetime.datetime.now().isoformat()))
+        
     print('Saving model to %s' % output_file)
     model.save(output_file)
 
