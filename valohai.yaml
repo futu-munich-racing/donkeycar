@@ -13,3 +13,30 @@
     inputs:
         - name: training-set
         - name: validation-set
+
+- step:
+    name: train-with-tf-records
+    image: tensorflow/tensorflow:1.13.1-gpu-py3
+    command: python 03_train_with_tfrecords.py
+    parameters:
+        - name: num-training-samples
+          type: integer
+        - name: num-validation-samples
+          type: integer
+        - name: verbose
+          type: flag
+        - name: batch-size
+          type: integer
+          default: 256
+        - name: epochs
+          type: integer
+          default: 100
+        - name: min-delta
+          type: float
+          default: 0.05
+        - name: patience
+          type: integer
+          default: 3
+    inputs:
+        - name: training-set
+        - name: validation-set
