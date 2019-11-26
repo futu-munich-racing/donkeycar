@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
     raw_validationset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'validation-set',
-                                                            'validation.tfrecord'))
+                                                            'val.tfrecord'))
     parsed_validationset = raw_validationset.map(_parse_fn)
 
     ## Training the car
