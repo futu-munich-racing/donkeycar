@@ -50,20 +50,6 @@ def decode_img(img):
     # resize the image to the desired size.
     return tf.image.resize(img, [120, 180])
 
-def process_path(file_path):
-    label = get_label(file_path)
-    # load the raw data from the file as a string
-    img = tf.io.read_file(file_path)
-    img = decode_img(img)
-    
-    return img, label
-
-def load_image(file_path):
-    img = tf.io.read_file(file_path)
-    img = decode_img(img)
-    
-    return img
-
 # The following functions can be used to convert a value to a type compatible
 # with tf.Example.
 
@@ -110,6 +96,7 @@ def convert_data_to_tfrecords(data_dir, output):
             throttle = record['user/throttle']
             example = serialize_example(image_string, angle, throttle)
             writer.write(example)
+            
             if i % 1000 == 0:
                 print(i, len(records), 100*i/len(records))
 
@@ -125,5 +112,6 @@ if __name__ == "__main__":
 
     convert_data_to_tfrecords(cli_parameters.train_input_dir,
                               cli_parameters.train_output)
+
     convert_data_to_tfrecords(cli_parameters.val_input_dir,
                               cli_parameters.val_output)

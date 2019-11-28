@@ -4,6 +4,7 @@
 import argparse
 import os
 import datetime
+import sys
 
 import tensorflow as tf
 tf.enable_eager_execution()
@@ -18,9 +19,6 @@ from tensorflow.python.keras.layers import Cropping2D, Cropping3D
 from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 # Parameters
-NUM_TRAIN_SAMPLES = 35998
-NUM_VAL_SAMPLES = 5368
-
 VERBOSE = True
 MIN_DELTA = 0.005
 PATIENCE = 5
@@ -57,7 +55,8 @@ def decode_jpeg(image_buffer, scope=None):
         return image
 
 def _parse_fn(example_serialized, is_training=False):
-    """ ...
+    """ Parse tensorflow records and return X, y, 
+        where X is image and y is (angle and throttle)
     """
     feature_map = {
         'image': tf.FixedLenFeature([], dtype=tf.string, default_value=''),
@@ -70,24 +69,6 @@ def _parse_fn(example_serialized, is_training=False):
     image = tf.reshape(image, (1, 240, 360, 3))
     return (image, (parsed['angle'], parsed['throttle']))
 
-
-def get_dataset(tfrecords_dir, subset, batch_size):
-    """Read TFRecords files and turn them into a TFRecordDataset."""
-    files = tf.matching_files(os.path.join(tfrecords_dir, '%s-*' % subset))
-    shards = tf.data.Dataset.from_tensor_slices(files)
-    shards = shards.shuffle(tf.cast(tf.shape(files)[0], tf.int64))
-    shards = shards.repeat()
-    dataset = shards.interleave(tf.data.TFRecordDataset, cycle_length=4)
-    dataset = dataset.shuffle(buffer_size=8192)
-    parser = partial(
-        _parse_fn, is_training=True if subset == 'train' else False)
-    dataset = dataset.apply(
-        tf.data.experimental.map_and_batch(
-            map_func=parser,
-            batch_size=batch_size,
-            num_parallel_calls=config.NUM_DATA_WORKERS))
-    dataset = dataset.prefetch(batch_size)
-    return dataset
 
 def create_2d_model(img_dims, crop_margin_from_top=80):
     tf.keras.backend.clear_session()
@@ -149,13 +130,13 @@ if __name__ == '__main__':
     inputs_dir = os.getenv('VH_INPUTS_DIR', '/')
     raw_trainset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'training-set',
-                                                            'train.tfrecords'))
+                                                            'train.tfrecord'))
     parsed_trainset = raw_trainset.map(_parse_fn)
 
     # Read validation dataset
     raw_validationset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'validation-set',
-                                                            'val.tfrecords'))
+                                                            'val.tfrecord'))
     parsed_validationset = raw_trainset.map(_parse_fn)
 
     #
