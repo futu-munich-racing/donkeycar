@@ -12,9 +12,9 @@
     command: preprocess.sh
     inputs:
         - name: training-set
-          default: s3://futurice-futurace/03_train_val_test_splits/train.zip
+          default: s3://futurice-futurace/03_train_val_test_splits/train.tar.gz
         - name: validation-set
-          default: s3://futurice-futurace/03_train_val_test_splits/val.zip
+          default: s3://futurice-futurace/03_train_val_test_splits/val.tar.gz
 
 - step:
     name: training

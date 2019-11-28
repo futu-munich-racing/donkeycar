@@ -3,8 +3,8 @@ ls /valohai/inputs
 mkdir -p data/train
 mkdir -p data/val
 
-unzip -o $VH_INPUTS_DIR/training-set/train.zip -d data/train/
-unzip -o $VH_INPUTS_DIR/validation-set/val.zip -d data/val/
+tar -zxvf $VH_INPUTS_DIR/training-set/train.tar.gz -c data/train/
+tar -zxvf $VH_INPUTS_DIR/validation-set/val.tar.gz -c data/val/
 
 ls data/train
 ls data/val
