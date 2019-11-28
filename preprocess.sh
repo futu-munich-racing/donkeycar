@@ -13,4 +13,4 @@ python3 02_convert2tfrecords.py \
         --train-input-dir data/train \
         --val-input-dir data/val \
         --train-output $VH_OUTPUTS_DIR/train.tfrecords \
-        --val-output $VH_OUTPUTS_DIR/val.tfrecord
+        --val-output $VH_OUTPUTS_DIR/val.tfrecords
