@@ -9,7 +9,7 @@ if [ ! -d "data/train" ];
     then unzip -q -o "$datadir/training-set/train.zip" -d data/train/;
 fi
 !if [ ! -d "data/val" ];
-    then unzip -q -o "$datadir/validation-set/val.zip" -d data/val/;
+    then unzip -q -o "$datadir/validation   -set/val.zip" -d data/val/;
 fi
 
 python3 02_convert2tfrecords.py \
