@@ -149,13 +149,13 @@ if __name__ == '__main__':
     inputs_dir = os.getenv('VH_INPUTS_DIR', '/')
     raw_trainset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'training-set',
-                                                            'train.tfrecord'))
+                                                            'train.tfrecords'))
     parsed_trainset = raw_trainset.map(_parse_fn)
 
     # Read validation dataset
     raw_validationset = tf.data.TFRecordDataset(os.path.join(inputs_dir,
                                                             'validation-set',
-                                                            'val.tfrecord'))
+                                                            'val.tfrecords'))
     parsed_validationset = raw_trainset.map(_parse_fn)
 
     #
