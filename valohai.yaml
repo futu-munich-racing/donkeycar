@@ -7,6 +7,16 @@
         - name: validation-set
 
 - step:
+    name: generate-tfrecords
+    image: tensorflow/tensorflow:1.13.1-py3
+    command: preprocess.sh
+    inputs:
+        - name: training-set
+          - default: s3://futurice-futurace/03_train_val_test_splits/train.zip
+        - name: validation-set
+          - default: s3://futurice-futurace/03_train_val_test_splits/val.zip
+
+- step:
     name: training
     image: tensorflow/tensorflow:1.13.1-gpu-py3
     command: python train.py
