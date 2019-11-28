@@ -29,10 +29,6 @@
     image: tensorflow/tensorflow:1.13.1-gpu-py3
     command: python 03_train_with_tfrecords.py
     parameters:
-        - name: num-training-samples
-          type: integer
-        - name: num-validation-samples
-          type: integer
         - name: batch-size
           type: integer
           default: 256

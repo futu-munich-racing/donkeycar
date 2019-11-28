@@ -137,9 +137,6 @@ class JsonLogger(tf.keras.callbacks.Callback):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num-training-samples', type=int)
-    parser.add_argument('--num-validation-samples', type=int)
-    
     parser.add_argument('--batch-size', type=int, default=BATCH_SIZE)
     parser.add_argument('--epochs', type=int, default=EPOCHS)
     parser.add_argument('--min-delta', type=float, default=MIN_DELTA)
@@ -164,6 +161,12 @@ if __name__ == '__main__':
     #
     ## Training the car
     #
+
+    num_train_samples = sum(1 for record in parsed_trainset)
+    num_val_samples = sum(1 for record in parsed_validationset)
+
+    print('Number of training / validation samples %d/%d' % (num_train_samples, 
+                                                             num_val_samples))
 
     weight_loss_angle = 0.9
     weight_loss_throttle = 0.1
@@ -195,8 +198,8 @@ if __name__ == '__main__':
     # Train the car
     model.fit(parsed_trainset,
             validation_data = parsed_validationset,
-            steps_per_epoch = NUM_TRAIN_SAMPLES // BATCH_SIZE,
-            validation_steps = NUM_VAL_SAMPLES // BATCH_SIZE,
+            steps_per_epoch = num_train_samples // BATCH_SIZE,
+            validation_steps = num_val_samples // BATCH_SIZE,
             batch_size=BATCH_SIZE,
             epochs=EPOCHS,
             callbacks=[JsonLogger()],
