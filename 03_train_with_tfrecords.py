@@ -17,8 +17,6 @@ from tensorflow.python.keras.layers import Dropout, Flatten, Dense
 from tensorflow.python.keras.layers import Cropping2D, Cropping3D
 from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
 
-
-
 # Parameters
 NUM_TRAIN_SAMPLES = 35998
 NUM_VAL_SAMPLES = 5368
@@ -137,7 +135,6 @@ class JsonLogger(tf.keras.callbacks.Callback):
         print(dict({'loss': logs['loss'], 'val_loss': logs['val_loss']}))
 
 if __name__ == '__main__':
-    #use_valohai_input()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--num-training-samples', type=int)
