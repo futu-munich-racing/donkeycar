@@ -5,6 +5,7 @@ import argparse
 import os
 import datetime
 import sys
+import json
 
 import tensorflow as tf
 tf.enable_eager_execution()
@@ -113,7 +114,16 @@ def create_2d_model(img_dims, crop_margin_from_top=80):
 
 class JsonLogger(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
-        print(dict({'loss': logs['loss'], 'val_loss': logs['val_loss']}))
+        print(
+            json.dumps(
+                dict(
+                    {
+                        'loss': logs['loss'],
+                        'val_loss': logs['val_loss']
+                    }
+                )
+            )
+        )
 
 if __name__ == '__main__':
 
@@ -183,7 +193,7 @@ if __name__ == '__main__':
             validation_steps = num_val_samples // BATCH_SIZE,
             batch_size=BATCH_SIZE,
             epochs=EPOCHS,
-            callbacks=[JsonLogger()],
+            callbacks=[JsonLogger(), save_best, early_stop],
             verbose=0)
 
     outputs_dir = os.getenv('VH_OUTPUTS_DIR', './')

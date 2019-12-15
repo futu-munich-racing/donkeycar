@@ -43,4 +43,6 @@
           default: 3
     inputs:
         - name: training-set
+          default: s3://futurice-futurace/data/01DT7/01DT7NWSQ44ZF5Y29T0GYZ9H0G/output-48/train.tfrecord
         - name: validation-set
+          default: s3://futurice-futurace/data/01DT7/01DT7NWSQ44ZF5Y29T0GYZ9H0G/output-48/val.tfrecord
